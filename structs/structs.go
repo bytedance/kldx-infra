@@ -17,6 +17,10 @@ type BatchCreateResult struct {
 	Ids []string `json:"_ids"`
 }
 
+type CountResult struct {
+	Count int64 `json:"count"`
+}
+
 // file
 
 type FileOption struct {

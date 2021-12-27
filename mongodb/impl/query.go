@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	Asc = 1
+	Asc  = 1
 	Desc = -1
 )
 
@@ -24,39 +24,87 @@ func NewQuery(param *MongodbParam) *Query {
 	return q
 }
 
-func (q *Query) Update() error {
+func (q *Query) Update(record interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
-	panic("implement me")
+
+	typ := reflect.TypeOf(record)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+	if typ.Kind() != reflect.Struct && typ.Kind() != reflect.Map {
+		return cExceptions.InvalidParamError("Update failed: record should be map or struct, but %s", typ)
+	}
+
+	q.SetOp(OpType_Update)
+	q.SetUpdate(cond.M{op.Set: record})
+	q.SetOne(true)
+	q.SetUpsert(false)
+	q.buildQuery()
+	return faasinfra.Update(q.MongodbParam)
 }
 
-func (q *Query) Upsert() error {
+func (q *Query) Upsert(record interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
-	panic("implement me")
+
+	typ := reflect.TypeOf(record)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+	if typ.Kind() != reflect.Struct && typ.Kind() != reflect.Map {
+		return cExceptions.InvalidParamError("Update failed: record should be map or struct, but %s", typ)
+	}
+
+	q.SetOp(OpType_Update)
+	q.SetUpdate(cond.M{op.Set: record})
+	q.SetOne(true)
+	q.SetUpsert(true)
+	q.buildQuery()
+	return faasinfra.Update(q.MongodbParam)
 }
 
-func (q *Query) BatchUpdate() error {
+func (q *Query) BatchUpdate(record interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
-	panic("implement me")
+
+	typ := reflect.TypeOf(record)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+	if typ.Kind() != reflect.Struct && typ.Kind() != reflect.Map {
+		return cExceptions.InvalidParamError("Update failed: record should be map or struct, but %s", typ)
+	}
+
+	q.SetOp(OpType_Update)
+	q.SetUpdate(cond.M{op.Set: record})
+	q.SetOne(false)
+	q.SetUpsert(false)
+	q.buildQuery()
+	return faasinfra.Update(q.MongodbParam)
 }
 
 func (q *Query) Delete() error {
 	if q.Err != nil {
 		return q.Err
 	}
-	panic("implement me")
+	q.SetOp(OpType_Delete)
+	q.SetOne(true)
+	q.buildQuery()
+	return faasinfra.Delete(q.MongodbParam)
 }
 
 func (q *Query) BatchDelete() error {
 	if q.Err != nil {
 		return q.Err
 	}
-	panic("implement me")
+	q.SetOp(OpType_Delete)
+	q.SetOne(false)
+	q.buildQuery()
+	return faasinfra.Delete(q.MongodbParam)
 }
 
 func (q *Query) Find(records interface{}) error {
@@ -64,14 +112,16 @@ func (q *Query) Find(records interface{}) error {
 		return q.Err
 	}
 	q.SetOp(OpType_Find)
+	q.buildQuery()
+	return faasinfra.Find(q.MongodbParam, records)
+}
 
+func (q *Query) buildQuery() {
 	if len(q.conditions) == 1 {
 		q.SetQuery(q.conditions[0])
 	} else if len(q.conditions) > 1 {
 		q.SetQuery(cond.M{op.And: q.conditions})
 	}
-
-	return faasinfra.Find(q.MongodbParam, records)
 }
 
 func (q *Query) FindOne(record interface{}) error {
@@ -80,6 +130,7 @@ func (q *Query) FindOne(record interface{}) error {
 	}
 	q.SetOp(OpType_FindOne)
 	q.SetLimit(1)
+	q.buildQuery()
 	return faasinfra.FindOne(q.MongodbParam, record)
 }
 

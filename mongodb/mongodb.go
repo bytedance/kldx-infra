@@ -21,9 +21,9 @@ type ITable interface {
 // 查询
 type IQuery interface {
 	// 更新
-	Update() error
-	Upsert() error
-	BatchUpdate() error
+	Update(record interface{}) error
+	Upsert(record interface{}) error
+	BatchUpdate(record interface{}) error
 
 	// 删除
 	Delete() error

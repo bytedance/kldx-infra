@@ -46,14 +46,17 @@ type MongodbArgs struct {
 	Skip         int64            `json:"skip,omitempty"`
 	Limit        int64            `json:"limit,omitempty"`
 	ArrayFilters interface{}      `json:"arrayFilters,omitempty"`
-	Upsert       bool             `json:"upsert,omitempty"`
+	Upsert       *bool            `json:"upsert,omitempty"`
 	Distinct     string           `json:"distinct,omitempty"`
 	Pipeline     interface{}      `json:"pipeline,omitempty"`
+	Update       interface{}      `json:"update,omitempty"`
+	One          *bool            `json:"one,omitempty"`
 }
 
 func NewMongodbArgs() *MongodbArgs {
 	return &MongodbArgs{
-		Sort: make(map[string]int64),
+		Sort:   make(map[string]int64),
+		Update: make(map[string]interface{}),
 	}
 }
 
@@ -67,6 +70,14 @@ func (p *MongodbParam) SetTableName(tableName string) {
 
 func (p *MongodbParam) SetOp(op OpType) {
 	p.Args.Op = opTypeString[op]
+}
+
+func (p *MongodbParam) SetOne(one bool) {
+	p.Args.One = &one
+}
+
+func (p *MongodbParam) SetUpsert(upsert bool) {
+	p.Args.Upsert = &upsert
 }
 
 func (a *MongodbParam) GetOp() string {
@@ -99,4 +110,8 @@ func (p *MongodbParam) SetQuery(condition interface{}) {
 
 func (p *MongodbParam) AddSort(field string, direct int64) {
 	p.Args.Sort[field] = direct
+}
+
+func (p *MongodbParam) SetUpdate(field2value interface{}) {
+	p.Args.Update = field2value
 }

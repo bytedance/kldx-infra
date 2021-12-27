@@ -4,7 +4,6 @@ import (
 	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
 	"code.byted.org/apaas/goapi_infra/structs"
 	"encoding/json"
-	"fmt"
 )
 
 func BatchCreate(param interface{}) ([]string, error) {
@@ -72,7 +71,29 @@ func Count(param interface{}) (int64, error) {
 		return 0, err
 	}
 
-	fmt.Println(string(data))
+	var result structs.CountResult
+	err = json.Unmarshal(data, &result)
+	if err != nil {
+		return 0, cExceptions.InternalError("Count failed, err: %v", err)
+	}
 
-	return 0, nil
+	return result.Count, nil
+}
+
+func Update(param interface{}) error {
+	_, err := doRequestMongodb(param)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Delete(param interface{}) error {
+	_, err := doRequestMongodb(param)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -125,3 +125,33 @@ func TestQuery_OrderBy(t *testing.T) {
 
 	utils.PrintLog(result)
 }
+
+// Count
+func TestQuery_Count(t *testing.T) {
+	db := NewMongodb()
+	T := db.Table("student")
+	count, err := T.Where(nil).Limit(100).Count()
+	if err != nil {
+		panic(err)
+	}
+
+	utils.PrintLog(count)
+}
+
+// Update
+func TestQuery_Update(t *testing.T) {
+	db := NewMongodb()
+	T := db.Table("student")
+	err := T.Where(cond.M{"_id":"61c99b7a96414a5793012868"}).Update(cond.M{"age":"21"})
+	if err != nil {
+		panic(err)
+	}
+
+	var result interface{}
+	err = T.Where(cond.M{"_id":"61c99b7a96414a5793012868"}).FindOne(&result)
+	if err != nil {
+		panic(err)
+	}
+
+	utils.PrintLog(result)
+}
