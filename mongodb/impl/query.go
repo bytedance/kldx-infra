@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	Asc = 1
+	Asc  = 1
 	Desc = -1
 )
 
@@ -19,44 +19,95 @@ type Query struct {
 	conditions []interface{}
 }
 
-func NewQuery(param *MongodbParam) *Query {
-	q := &Query{MongodbParam: param}
+func NewQuery(tableName string) *Query {
+	q := &Query{MongodbParam: &MongodbParam{
+		TableName: tableName,
+		Args: NewMongodbArgs(),
+	}}
 	return q
 }
 
-func (q *Query) Update() error {
+func (q *Query) Update(record interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
-	panic("implement me")
+
+	typ := reflect.TypeOf(record)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+	if typ.Kind() != reflect.Struct && typ.Kind() != reflect.Map {
+		return cExceptions.InvalidParamError("Update failed: record should be map or struct, but %s", typ)
+	}
+
+	q.SetOp(OpType_Update)
+	q.SetUpdate(cond.M{op.Set: record})
+	q.SetOne(true)
+	q.SetUpsert(false)
+	q.buildQuery()
+	return faasinfra.Update(q.MongodbParam)
 }
 
-func (q *Query) Upsert() error {
+func (q *Query) Upsert(record interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
-	panic("implement me")
+
+	typ := reflect.TypeOf(record)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+	if typ.Kind() != reflect.Struct && typ.Kind() != reflect.Map {
+		return cExceptions.InvalidParamError("Update failed: record should be map or struct, but %s", typ)
+	}
+
+	q.SetOp(OpType_Update)
+	q.SetUpdate(cond.M{op.Set: record})
+	q.SetOne(true)
+	q.SetUpsert(true)
+	q.buildQuery()
+	return faasinfra.Update(q.MongodbParam)
 }
 
-func (q *Query) BatchUpdate() error {
+func (q *Query) BatchUpdate(record interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
-	panic("implement me")
+
+	typ := reflect.TypeOf(record)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+	if typ.Kind() != reflect.Struct && typ.Kind() != reflect.Map {
+		return cExceptions.InvalidParamError("Update failed: record should be map or struct, but %s", typ)
+	}
+
+	q.SetOp(OpType_Update)
+	q.SetUpdate(cond.M{op.Set: record})
+	q.SetOne(false)
+	q.SetUpsert(false)
+	q.buildQuery()
+	return faasinfra.Update(q.MongodbParam)
 }
 
 func (q *Query) Delete() error {
 	if q.Err != nil {
 		return q.Err
 	}
-	panic("implement me")
+	q.SetOp(OpType_Delete)
+	q.SetOne(true)
+	q.buildQuery()
+	return faasinfra.Delete(q.MongodbParam)
 }
 
 func (q *Query) BatchDelete() error {
 	if q.Err != nil {
 		return q.Err
 	}
-	panic("implement me")
+	q.SetOp(OpType_Delete)
+	q.SetOne(false)
+	q.buildQuery()
+	return faasinfra.Delete(q.MongodbParam)
 }
 
 func (q *Query) Find(records interface{}) error {
@@ -64,13 +115,7 @@ func (q *Query) Find(records interface{}) error {
 		return q.Err
 	}
 	q.SetOp(OpType_Find)
-
-	if len(q.conditions) == 1 {
-		q.SetQuery(q.conditions[0])
-	} else if len(q.conditions) > 1 {
-		q.SetQuery(cond.M{op.And: q.conditions})
-	}
-
+	q.buildQuery()
 	return faasinfra.Find(q.MongodbParam, records)
 }
 
@@ -80,6 +125,7 @@ func (q *Query) FindOne(record interface{}) error {
 	}
 	q.SetOp(OpType_FindOne)
 	q.SetLimit(1)
+	q.buildQuery()
 	return faasinfra.FindOne(q.MongodbParam, record)
 }
 
@@ -110,18 +156,6 @@ func (q *Query) Where(condition interface{}, args ...interface{}) mongodb.IQuery
 	return q
 }
 
-func (q *Query) And(elems ...interface{}) mongodb.IQuery {
-	panic("implement me")
-}
-
-func (q *Query) Or(elems ...interface{}) mongodb.IQuery {
-	panic("implement me")
-}
-
-func (q *Query) Nor(elems ...interface{}) mongodb.IQuery {
-	panic("implement me")
-}
-
 func (q *Query) Limit(limit int64) mongodb.IQuery {
 	if q.Err != nil {
 		return q
@@ -136,10 +170,6 @@ func (q *Query) Offset(offset int64) mongodb.IQuery {
 	}
 	q.SetOffset(offset)
 	return q
-}
-
-func (q *Query) Sort(v interface{}) mongodb.IQuery {
-	panic("implement me")
 }
 
 func (q *Query) OrderBy(fields ...string) mongodb.IQuery {
@@ -168,17 +198,33 @@ func (q *Query) Count() (int64, error) {
 	}
 
 	q.SetOp(OpType_Count)
+	q.buildQuery()
 	return faasinfra.Count(q.MongodbParam)
 }
 
-func (q *Query) Distinct(field string, args ...interface{}) mongodb.IQuery {
-	panic("implement me")
+func (q *Query) Distinct(field string, v interface{}) error {
+	if q.Err != nil {
+		return q.Err
+	}
+
+	q.SetOp(OpType_Distinct)
+	q.SetKey(field)
+	return faasinfra.Distinct(q.MongodbParam, v)
 }
 
-func (q *Query) Project(v interface{}) mongodb.IQuery {
-	panic("implement me")
+func (q *Query) Project(projection interface{}) mongodb.IQuery {
+	if q.Err != nil {
+		return q
+	}
+
+	q.SetProjection(projection)
+	return q
 }
 
-func (q *Query) GroupBy(field string, args ...interface{}) mongodb.IAggQuery {
-	panic("implement me")
+func (q *Query) buildQuery() {
+	if len(q.conditions) == 1 {
+		q.SetQuery(q.conditions[0])
+	} else if len(q.conditions) > 1 {
+		q.SetQuery(cond.M{op.And: q.conditions})
+	}
 }
