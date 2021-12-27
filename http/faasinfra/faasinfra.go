@@ -1,6 +1,8 @@
 package faasinfra
 
 import (
+	"bytes"
+	cConstants "code.byted.org/apaas/goapi_common/constants"
 	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
 	cHttp "code.byted.org/apaas/goapi_common/http"
 	"code.byted.org/apaas/goapi_infra/http"
@@ -46,4 +48,10 @@ func doRequestMongodb(param interface{}) ([]byte, error) {
 	fmt.Println(string(pStr))
 
 	return errorWrapper(http.GetFaasinfraClient().PostJson(http.GetFaasinfraPath_Mongodb(), nil, param, cHttp.AppTokenMiddleware, http.FaasinfraMiddleware))
+}
+
+func doRequestFile(contentType string, body *bytes.Buffer) ([]byte, error) {
+	return errorWrapper(http.GetFaasinfraClient().PostFormData(http.GetFaasinfraPath_File(), map[string][]string{
+		cConstants.HttpHeaderKey_ContentType: {contentType},
+	}, body, cHttp.AppTokenMiddleware, http.FaasinfraMiddleware))
 }
