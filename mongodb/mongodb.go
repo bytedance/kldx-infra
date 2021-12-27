@@ -1,6 +1,8 @@
 package mongodb
 
-import "code.byted.org/apaas/goapi_infra/common/structs"
+import (
+	"code.byted.org/apaas/goapi_infra/structs"
+)
 
 type IMongodb interface {
 	Table(tableName string) ITable
@@ -32,12 +34,18 @@ type IQuery interface {
 	FindOne(record interface{}) error
 
 	Where(condition interface{}, args ...interface{}) IQuery
+	// @Deprecated
 	And(elems ...interface{}) IQuery
+	// @Deprecated
 	Or(elems ...interface{}) IQuery
+	// @Deprecated
 	Nor(elems ...interface{}) IQuery
 	Limit(limit int64) IQuery
 	Offset(offset int64) IQuery
+	// @Deprecated
 	Sort(v interface{}) IQuery
+	OrderBy(fields ...string) IQuery
+	OrderByDesc(fields ...string) IQuery
 	Count() (int64, error)
 	Distinct(field string, args ...interface{}) IQuery
 	Project(v interface{}) IQuery

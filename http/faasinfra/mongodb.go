@@ -1,9 +1,10 @@
 package faasinfra
 
 import (
-	"code.byted.org/apaas/goapi_infra/common/exceptions"
-	"code.byted.org/apaas/goapi_infra/common/structs"
+	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
+	"code.byted.org/apaas/goapi_infra/structs"
 	"encoding/json"
+	"fmt"
 )
 
 func BatchCreate(param interface{}) ([]string, error) {
@@ -15,7 +16,7 @@ func BatchCreate(param interface{}) ([]string, error) {
 	var result structs.BatchCreateResult
 	err = json.Unmarshal(data, &result)
 	if err != nil {
-		return nil, exceptions.InternalError("BatchCreate failed, err: %v", err)
+		return nil, cExceptions.InternalError("BatchCreate failed, err: %v", err)
 	}
 
 	var ids []string
@@ -47,7 +48,7 @@ func Find(param, records interface{}) error {
 
 	err = json.Unmarshal(data, &records)
 	if err != nil {
-		return exceptions.InternalError("Find failed, err: %v", err)
+		return cExceptions.InternalError("Find failed, err: %v", err)
 	}
 	return nil
 }
@@ -60,7 +61,18 @@ func FindOne(param, record interface{}) error {
 
 	err = json.Unmarshal(data, &record)
 	if err != nil {
-		return exceptions.InternalError("FindOne failed, err: %v", err)
+		return cExceptions.InternalError("FindOne failed, err: %v", err)
 	}
 	return nil
+}
+
+func Count(param interface{}) (int64, error) {
+	data, err := doRequestMongodb(param)
+	if err != nil {
+		return 0, err
+	}
+
+	fmt.Println(string(data))
+
+	return 0, nil
 }

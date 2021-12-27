@@ -1,7 +1,8 @@
 package faasinfra
 
 import (
-	"code.byted.org/apaas/goapi_infra/common/exceptions"
+	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
+	cHttp "code.byted.org/apaas/goapi_common/http"
 	"code.byted.org/apaas/goapi_infra/http"
 	"encoding/json"
 	"fmt"
@@ -20,7 +21,7 @@ const (
 
 func errorWrapper(body []byte, err error) ([]byte, error) {
 	if err != nil {
-		return nil, exceptions.ErrorWrap(err)
+		return nil, cExceptions.ErrorWrap(err)
 	}
 
 	code := gjson.GetBytes(body, "code").String()
@@ -34,9 +35,9 @@ func errorWrapper(body []byte, err error) ([]byte, error) {
 		return []byte(data.Raw), nil
 	case FaasinfraFailCode_InternalError, FaasinfraFailCode_TokenExpire, FaasinfraFailCode_IllegalToken,
 		FaasinfraFailCode_MissingToken, FaasinfraFailCode_RateLimitError:
-		return nil, exceptions.InternalError("request openapi failed, code: %s, msg: %s", code, msg)
+		return nil, cExceptions.InternalError("request openapi failed, code: %s, msg: %s", code, msg)
 	default:
-		return nil, exceptions.InvalidParamError("request openapi failed, code: %s, msg: %s", code, msg)
+		return nil, cExceptions.InvalidParamError("request openapi failed, code: %s, msg: %s", code, msg)
 	}
 }
 
@@ -44,5 +45,5 @@ func doRequestMongodb(param interface{}) ([]byte, error) {
 	pStr, _ := json.Marshal(param)
 	fmt.Println(string(pStr))
 
-	return errorWrapper(http.GetFaasinfraClient().PostJson(http.GetFaasinfraPath_Mongodb(), nil, param, http.AppTokenMiddleware))
+	return errorWrapper(http.GetFaasinfraClient().PostJson(http.GetFaasinfraPath_Mongodb(), nil, param, cHttp.AppTokenMiddleware, http.FaasinfraMiddleware))
 }
