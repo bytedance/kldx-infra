@@ -1,7 +1,7 @@
 package impl
 
 import (
-	"code.byted.org/apaas/goapi_infra/mongodb"
+	"github/kldx/infra/mongodb"
 )
 
 type Mongodb struct {

@@ -2,9 +2,9 @@ package faasinfra
 
 import (
 	"bytes"
-	cException "code.byted.org/apaas/goapi_common/exceptions"
-	"code.byted.org/apaas/goapi_infra/common/constants"
-	"code.byted.org/apaas/goapi_infra/structs"
+	cException "github/kldx/common/exceptions"
+	"github/kldx/infra/common/constants"
+	"github/kldx/infra/structs"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"

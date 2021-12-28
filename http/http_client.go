@@ -1,8 +1,8 @@
 package http
 
 import (
-	cHttp "code.byted.org/apaas/goapi_common/http"
-	"code.byted.org/apaas/goapi_infra/common/utils"
+	cHttp "github/kldx/common/http"
+	"github/kldx/infra/common/utils"
 	"net/http"
 	"sync"
 )

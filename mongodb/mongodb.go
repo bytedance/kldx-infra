@@ -1,7 +1,7 @@
 package mongodb
 
 import (
-	"code.byted.org/apaas/goapi_infra/structs"
+	"github/kldx/infra/structs"
 )
 
 type IMongodb interface {

@@ -1,6 +1,6 @@
 package cond
 
-import op "code.byted.org/apaas/goapi_infra/mongodb/operator"
+import op "github/kldx/infra/mongodb/operator"
 
 type M map[string]interface{}
 
