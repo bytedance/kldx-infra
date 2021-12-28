@@ -19,8 +19,11 @@ type Query struct {
 	conditions []interface{}
 }
 
-func NewQuery(param *MongodbParam) *Query {
-	q := &Query{MongodbParam: param}
+func NewQuery(tableName string) *Query {
+	q := &Query{MongodbParam: &MongodbParam{
+		TableName: tableName,
+		Args: NewMongodbArgs(),
+	}}
 	return q
 }
 

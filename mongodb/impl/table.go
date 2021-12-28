@@ -40,5 +40,5 @@ func (t *Table) BatchCreate(records interface{}) ([]string, error) {
 }
 
 func (t *Table) Where(condition interface{}, args ...interface{}) mongodb.IQuery {
-	return NewQuery(t.MongodbParam).Where(condition, args)
+	return NewQuery(t.MongodbParam.TableName).Where(condition, args)
 }
