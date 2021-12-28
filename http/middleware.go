@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func FaasinfraMiddleware(req *http.Request) error {
+func FaaSInfraMiddleware(req *http.Request) error {
 	req.Header.Add(cConstants.HttpHeaderKey_Tenant, cUtils.GetTenant().Name)
 	req.Header.Add(cConstants.HttpHeaderKey_User, "-1")
 	req.Header.Add(cConstants.HttpHeaderKey_MicroserviceId, cUtils.GetMicroserviceId())

@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	faasinfraClientOnce sync.Once
-	faasinfraClient     *cHttp.HttpClient
+	fiOnce   sync.Once
+	fiClient *cHttp.HttpClient
 )
 
-func GetFaasinfraClient() *cHttp.HttpClient {
+func GetFaaSInfraClient() *cHttp.HttpClient {
 	conf := utils.GetFaasinfraClientConf()
-	faasinfraClientOnce.Do(func() {
-		faasinfraClient = &cHttp.HttpClient{
+	fiOnce.Do(func() {
+		fiClient = &cHttp.HttpClient{
 			Client: http.Client{
 				Transport: &http.Transport{
 					MaxIdleConns:        conf.MaxIdleConns,
@@ -26,5 +26,5 @@ func GetFaasinfraClient() *cHttp.HttpClient {
 			Url: conf.Url,
 		}
 	})
-	return faasinfraClient
+	return fiClient
 }
