@@ -1,8 +1,8 @@
 package utils
 
 import (
-	cStructs "code.byted.org/apaas/goapi_common/structs"
-	cUtils "code.byted.org/apaas/goapi_common/utils"
+	cStructs "github/kldx/common/structs"
+	cUtils "github/kldx/common/utils"
 	"encoding/json"
 	"fmt"
 	"reflect"

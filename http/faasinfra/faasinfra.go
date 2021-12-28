@@ -2,10 +2,10 @@ package faasinfra
 
 import (
 	"bytes"
-	cConstants "code.byted.org/apaas/goapi_common/constants"
-	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
-	cHttp "code.byted.org/apaas/goapi_common/http"
-	"code.byted.org/apaas/goapi_infra/http"
+	cConstants "github/kldx/common/constants"
+	cExceptions "github/kldx/common/exceptions"
+	cHttp "github/kldx/common/http"
+	"github/kldx/infra/http"
 	"encoding/json"
 	"fmt"
 	"github.com/tidwall/gjson"

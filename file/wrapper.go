@@ -1,9 +1,9 @@
 package file
 
 import (
-	cException "code.byted.org/apaas/goapi_common/exceptions"
-	"code.byted.org/apaas/goapi_infra/http/faasinfra"
-	"code.byted.org/apaas/goapi_infra/structs"
+	cException "github/kldx/common/exceptions"
+	"github/kldx/infra/http/faasinfra"
+	"github/kldx/infra/structs"
 	"io/ioutil"
 )
 

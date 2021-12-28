@@ -1,8 +1,8 @@
 package impl
 
 import (
-	"code.byted.org/apaas/goapi_infra/common/utils"
-	cond "code.byted.org/apaas/goapi_infra/mongodb/condition"
+	"github/kldx/infra/common/utils"
+	cond "github/kldx/infra/mongodb/condition"
 	"testing"
 )
 
