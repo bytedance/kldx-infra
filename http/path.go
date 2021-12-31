@@ -9,6 +9,7 @@ import (
 const (
 	FaaSInfraPathMongodb = "/resource/v1/namespaces/:namespace/db"
 	FaaSInfraPathRedis   = "/resource/v1/namespaces/:namespace/cache"
+	FaaSInfraPathFile  = "/resource/v1/namespaces/:namespace/file"
 )
 
 func GetFaaSInfraPathMongodb() string {
@@ -17,4 +18,8 @@ func GetFaaSInfraPathMongodb() string {
 
 func GetFaaSInfraPathRedis() string {
 	return strings.ReplaceAll(FaaSInfraPathRedis, cConstants.ReplaceNamespace, cUtils.GetTenant().Namespace)
+}
+
+func GetFaaSInfraPathFile() string {
+	return strings.ReplaceAll(FaaSInfraPathFile, cConstants.ReplaceNamespace, cUtils.GetTenant().Namespace)
 }

@@ -39,7 +39,7 @@ func doRequestMongodb(param interface{}) ([]byte, error) {
 }
 
 func doRequestFile(contentType string, body *bytes.Buffer) ([]byte, error) {
-	return errorWrapper(http.GetFaasinfraClient().PostFormData(http.GetFaasinfraPath_File(), map[string][]string{
+	return errorWrapper(http.GetFaaSInfraClient().PostFormData(http.GetFaaSInfraPathFile(), map[string][]string{
 		cConstants.HttpHeaderKey_ContentType: {contentType},
-	}, body, cHttp.AppTokenMiddleware, http.FaasinfraMiddleware))
+	}, body, cHttp.AppTokenMiddleware, http.FaaSInfraMiddleware))
 }
