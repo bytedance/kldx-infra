@@ -28,3 +28,21 @@ func GetFaaSInfraClient() *cHttp.HttpClient {
 	})
 	return fiClient
 }
+
+var (
+	httpClientOnce sync.Once
+	httpClient     *http.Client
+)
+
+func GetCommonHttpClient() *http.Client {
+	httpClientOnce.Do(func() {
+		httpClient = &http.Client{
+			Transport: &http.Transport{
+				MaxIdleConns:        100,
+				MaxIdleConnsPerHost: 10,
+			},
+		}
+	})
+	return httpClient
+}
+

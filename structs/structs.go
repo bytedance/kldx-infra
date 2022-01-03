@@ -16,15 +16,3 @@ type RecordOnlyId struct {
 type BatchCreateResult struct {
 	Ids []string `json:"_ids"`
 }
-
-// file
-
-type FileOption struct {
-	Type   string `json:"type"`   // http content type
-	Region string `json:"region"` // region of storage
-}
-
-type FileUploadResult struct {
-	ID  string `json:"id,omitempty"`
-	URL string `json:"url,omitempty"`
-}

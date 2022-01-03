@@ -38,7 +38,7 @@ func doRequestMongodb(param interface{}) ([]byte, error) {
 	return errorWrapper(http.GetFaaSInfraClient().PostJson(http.GetFaaSInfraPathMongodb(), nil, param, cHttp.AppTokenMiddleware, http.FaaSInfraMiddleware))
 }
 
-func doRequestFile(contentType string, body *bytes.Buffer) ([]byte, error) {
+func DoRequestFile(contentType string, body *bytes.Buffer) ([]byte, error) {
 	return errorWrapper(http.GetFaaSInfraClient().PostFormData(http.GetFaaSInfraPathFile(), map[string][]string{
 		cConstants.HttpHeaderKey_ContentType: {contentType},
 	}, body, cHttp.AppTokenMiddleware, http.FaaSInfraMiddleware))
