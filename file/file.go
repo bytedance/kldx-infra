@@ -5,11 +5,17 @@ import (
 	"io/ioutil"
 )
 
-func UploadWithContent(name string, content []byte, option *Option) (*UploadResult, error) {
+type File struct {}
+
+func NewFile() *File {
+	return &File{}
+}
+
+func (f *File) UploadWithContent(name string, content []byte, option *Option) (*UploadResult, error) {
 	return uploadWithContent(name, content, option)
 }
 
-func UploadWithURL(name string, targetUrl string, option *Option) (*UploadResult, error) {
+func (f *File) UploadWithURL(name string, targetUrl string, option *Option) (*UploadResult, error) {
 	data, err := readFromURL(targetUrl)
 	if err != nil {
 		return nil, cException.InvalidParamError("fetch data from targetUrl error: %v", err)
@@ -17,7 +23,7 @@ func UploadWithURL(name string, targetUrl string, option *Option) (*UploadResult
 	return uploadWithContent(name, data, option)
 }
 
-func UploadWithPath(name string, filePath string, option *Option) (*UploadResult, error) {
+func (f *File) UploadWithPath(name string, filePath string, option *Option) (*UploadResult, error) {
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, cException.InvalidParamError("read data from filePath error: %v", err)

@@ -39,3 +39,28 @@ func TestTable_BatchCreate_Goods(t *testing.T) {
 
 	utils.PrintLog(result)
 }
+
+func TestTable_Create_Employee(t *testing.T) {
+	db := NewMongodb()
+	T := db.Table("employee")
+	result, err := T.Create(map[string]interface{}{"name": "小刚", "age": 19})
+	if err != nil {
+		panic(err)
+	}
+
+	utils.PrintLog(result)
+}
+
+func TestTable_BatchCreate_Employee(t *testing.T) {
+	db := NewMongodb()
+	T := db.Table("employee")
+	result, err := T.BatchCreate([]*map[string]interface{}{
+		{"name": "小花", "age": 20},
+		{"name": "小明", "age": 18},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	utils.PrintLog(result)
+}

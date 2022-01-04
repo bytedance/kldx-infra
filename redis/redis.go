@@ -6,6 +6,10 @@ import (
 
 type Redis struct{}
 
+func NewRedis() *Redis {
+	return &Redis{}
+}
+
 func (c *Redis) TTL(key string) *DurationCmd {
 	cmd := NewDurationCmd(c, "ttl", key)
 	cmd.execute()

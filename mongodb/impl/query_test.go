@@ -3,6 +3,7 @@ package impl
 import (
 	"code.byted.org/apaas/goapi_infra/common/utils"
 	cond "code.byted.org/apaas/goapi_infra/mongodb/condition"
+	"code.byted.org/apaas/goapi_infra/structs"
 	"testing"
 )
 
@@ -69,6 +70,38 @@ func TestQuery_Where_In(t *testing.T) {
 	err := T.Where(
 		cond.M{
 			"info.city": cond.In([]string{"beijing", "shanghai"}),
+		},
+	).Find(&result)
+	if err != nil {
+		panic(err)
+	}
+
+	utils.PrintLog(result)
+}
+
+func TestQuery_Where_Eployee_In(t *testing.T) {
+	db := NewMongodb()
+	T := db.Table("employee")
+	var result interface{}
+	err := T.Where(
+		cond.M{
+			"_id": cond.In([]string{"61d3e852360c334d0d59eb9c", "61d3e89ec4b8d83e519a6dca", "61d3e89ec4b8d83e519a6dcb"}),
+		},
+	).Find(&result)
+	if err != nil {
+		panic(err)
+	}
+
+	utils.PrintLog(result)
+}
+
+func TestQuery_Where_Eployee(t *testing.T) {
+	db := NewMongodb()
+	T := db.Table("employee")
+	var result interface{}
+	err := T.Where(
+		cond.M{
+			"_id": "61d3e852360c334d0d59eb9c",
 		},
 	).Find(&result)
 	if err != nil {
@@ -185,16 +218,14 @@ func TestQuery_Project(t *testing.T) {
 func TestQuery_Update(t *testing.T) {
 	db := NewMongodb()
 
-	_id, _ := db.ParseObjectId("61c99b7a96414a5793012868")
-
 	T := db.Table("student")
-	err := T.Where(cond.M{"_id": cond.Eq(_id)}).Update(cond.M{"age": "22"})
+	err := T.Where(cond.M{"_id": cond.Eq("61c99b7a96414a5793012868")}).Update(cond.M{"age": "22"})
 	if err != nil {
 		panic(err)
 	}
 
 	var result interface{}
-	err = T.Where(cond.M{"_id": cond.Eq(_id)}).FindOne(&result)
+	err = T.Where(cond.M{"_id": cond.Eq("61c99b7a96414a5793012868")}).FindOne(&result)
 	if err != nil {
 		panic(err)
 	}
@@ -225,14 +256,30 @@ func TestQuery_BatchUpdate(t *testing.T) {
 	db := NewMongodb()
 	T := db.Table("student")
 
-	var results interface{}
+	var results []*structs.RecordOnlyId
 	err := T.Where(nil).Find(&results)
 	if err != nil {
 		panic(err)
 	}
 	utils.PrintLog(results)
 
-	err = T.Where(cond.M{"_id": cond.In([]string{"61c99b7a96414a5793012868", "61cac55683420b07931a0190"})}).BatchUpdate(cond.M{"age": "30"})
+	var ids []interface{}
+	for _, r := range results {
+		ids = append(ids, r.Id)
+	}
+
+	err = T.Where(cond.M{"_id": cond.In(ids)}).Find(&results)
+	if err != nil {
+		panic(err)
+	}
+	utils.PrintLog(results)
+
+	err = T.Where(cond.M{"_id": cond.In(ids)}).BatchDelete()
+	if err != nil {
+		panic(err)
+	}
+
+	err = T.Where(cond.M{"_id": cond.In([]interface{}{"61c99b7a96414a5793012868", "61c92930a8125721fb44f257"})}).BatchUpdate(cond.M{"age": "32"})
 	if err != nil {
 		panic(err)
 	}
@@ -245,7 +292,7 @@ func TestQuery_BatchUpdate(t *testing.T) {
 	utils.PrintLog(result1)
 
 	var result2 interface{}
-	err = T.Where(cond.M{"_id": "61cac9253431e5bda4a43ce3"}).Find(&result2)
+	err = T.Where(cond.M{"_id": "61c92930a8125721fb44f257"}).Find(&result2)
 	if err != nil {
 		panic(err)
 	}

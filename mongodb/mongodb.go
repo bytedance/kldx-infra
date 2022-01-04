@@ -2,13 +2,10 @@ package mongodb
 
 import (
 	"code.byted.org/apaas/goapi_infra/structs"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type IMongodb interface {
 	Table(tableName string) ITable
-	NewObjectId() primitive.ObjectID
-	ParseObjectId(_id string) (primitive.ObjectID, error)
 }
 
 // 表
