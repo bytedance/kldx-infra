@@ -4,7 +4,7 @@ import (
 	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
 	"code.byted.org/apaas/goapi_infra/http/faasinfra"
 	"code.byted.org/apaas/goapi_infra/mongodb"
-	"code.byted.org/apaas/goapi_infra/structs"
+	"code.byted.org/apaas/goapi_infra/mongodb/structs"
 )
 
 type Table struct {

@@ -2,7 +2,7 @@ package faasinfra
 
 import (
 	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
-	"code.byted.org/apaas/goapi_infra/structs"
+	"code.byted.org/apaas/goapi_infra/mongodb/structs"
 	"encoding/json"
 )
 

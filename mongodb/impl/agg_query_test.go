@@ -151,7 +151,7 @@ func TestQuery_GroupBy_Having(t *testing.T) {
 	T := db.Table("goods")
 
 	var results interface{}
-	err := T.GroupBy("info.city", "city").Push([]string{"item", "qty"}, "list").Having(cond.M{"item": cond.Gt(40)}).Find(&results)
+	err := T.GroupBy("info.city", "city").Push([]string{"item", "qty"}, "list").Having(cond.M{"qty": cond.Gt(40)}).Find(&results)
 	if err != nil {
 		panic(err)
 	}

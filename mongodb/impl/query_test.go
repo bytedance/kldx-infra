@@ -3,17 +3,17 @@ package impl
 import (
 	"code.byted.org/apaas/goapi_infra/common/utils"
 	cond "code.byted.org/apaas/goapi_infra/mongodb/condition"
-	"code.byted.org/apaas/goapi_infra/structs"
+	"code.byted.org/apaas/goapi_infra/mongodb/structs"
 	"testing"
 )
 
 type Goods struct {
-	ID        string    `json:"_id"`
-	Item      string    `json:"item"`
-	Qty       int64     `json:"qty"`
-	Info      GoodsInfo `json:"info,omitempty"`
-	CreatedAt string    `json:"createdAt,omitempty"`
-	UpdatedAt string    `json:"updatedAt,omitempty"`
+	ID        string     `json:"_id"`
+	Item      string     `json:"item"`
+	Qty       int64      `json:"qty"`
+	Info      *GoodsInfo `json:"info,omitempty"`
+	CreatedAt string     `json:"createdAt,omitempty"`
+	UpdatedAt string     `json:"updatedAt,omitempty"`
 }
 
 type GoodsInfo struct {
@@ -45,14 +45,12 @@ func TestQuery_FindOne_OneGoods(t *testing.T) {
 	utils.PrintLog(result)
 }
 
-// TODO _id 查不到数据
 func TestQuery_Where_Eq(t *testing.T) {
 	db := NewMongodb()
 	T := db.Table("goods")
 	var result []*Goods
 	err := T.Where(
 		cond.M{
-			//"_id": cond.Eq("61cd58f0791435c7bf31453b"),
 			"_id": "61cd58f0791435c7bf31453b",
 		},
 	).Find(&result)
@@ -81,11 +79,11 @@ func TestQuery_Where_In(t *testing.T) {
 
 func TestQuery_Where_Eployee_In(t *testing.T) {
 	db := NewMongodb()
-	T := db.Table("employee")
+	T := db.Table("emp")
 	var result interface{}
 	err := T.Where(
 		cond.M{
-			"_id": cond.In([]string{"61d3e852360c334d0d59eb9c", "61d3e89ec4b8d83e519a6dca", "61d3e89ec4b8d83e519a6dcb"}),
+			"_id": cond.In([]string{"61d3f7b088e069bd971f5552", "61d3f7b5ccc793268ce1da72", "61d3f7b5ccc793268ce1da73"}),
 		},
 	).Find(&result)
 	if err != nil {
@@ -97,13 +95,9 @@ func TestQuery_Where_Eployee_In(t *testing.T) {
 
 func TestQuery_Where_Eployee(t *testing.T) {
 	db := NewMongodb()
-	T := db.Table("employee")
+	T := db.Table("emp")
 	var result interface{}
-	err := T.Where(
-		cond.M{
-			"_id": "61d3e852360c334d0d59eb9c",
-		},
-	).Find(&result)
+	err := T.Where(nil).Find(&result)
 	if err != nil {
 		panic(err)
 	}
@@ -201,13 +195,12 @@ func TestQuery_Distinct(t *testing.T) {
 	utils.PrintLog(cities)
 }
 
-// TODO 直接指定复合字段无效（比如：info）
 func TestQuery_Project(t *testing.T) {
 	db := NewMongodb()
 	T := db.Table("goods")
 
-	var results []Goods
-	err := T.Where(nil).Project(cond.M{"createdAt": 0,"updatedAt": 0}).Find(&results)
+	var results []*Goods
+	err := T.Where(nil).Project(cond.M{"createdAt": 0, "updatedAt": 0, "info": 0}).Find(&results)
 	if err != nil {
 		panic(err)
 	}
@@ -332,4 +325,23 @@ func TestQuery_BatchDelete(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func TestTable_BatchDelete_Goods(t *testing.T) {
+	db := NewMongodb()
+	T := db.Table("goods")
+
+	var res1 interface{}
+	err := T.Where(nil).Find(&res1)
+	if err != nil {
+		panic(err)
+	}
+	utils.PrintLog(res1)
+
+	var res2 interface{}
+	err = T.Where(cond.M{"qty": cond.Gt(0)}).Find(&res2)
+	if err != nil {
+		panic(err)
+	}
+	utils.PrintLog(res2)
 }
