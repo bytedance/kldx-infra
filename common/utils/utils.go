@@ -1,8 +1,8 @@
 package utils
 
 import (
-	cStructs "github/kldx/common/structs"
-	cUtils "github/kldx/common/utils"
+	cStructs "github.com/bytedance/kldx-common/structs"
+	cUtils "github.com/bytedance/kldx-common/utils"
 	"encoding/json"
 	"fmt"
 	"reflect"

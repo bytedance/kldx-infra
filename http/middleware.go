@@ -1,8 +1,8 @@
 package http
 
 import (
-	cConstants "github/kldx/common/constants"
-	cUtils "github/kldx/common/utils"
+	cConstants "github.com/bytedance/kldx-common/constants"
+	cUtils "github.com/bytedance/kldx-common/utils"
 	"net/http"
 )
 

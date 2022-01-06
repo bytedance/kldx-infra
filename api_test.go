@@ -1,8 +1,8 @@
 package infra
 
 import (
-	"code.byted.org/apaas/goapi_infra/common/utils"
-	cond "code.byted.org/apaas/goapi_infra/mongodb/condition"
+	"github.com/bytedance/kldx-infra/common/utils"
+	cond "github.com/bytedance/kldx-infra/mongodb/condition"
 	"testing"
 )
 

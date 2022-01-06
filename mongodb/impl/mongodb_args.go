@@ -1,7 +1,7 @@
 package impl
 
 import (
-	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
+	cExceptions "github.com/bytedance/kldx-common/exceptions"
 )
 
 type OpType int

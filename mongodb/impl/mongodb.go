@@ -1,7 +1,7 @@
 package impl
 
 import (
-	"github/kldx/infra/mongodb"
+	"github.com/bytedance/kldx-infra/mongodb"
 )
 
 type Mongodb struct {

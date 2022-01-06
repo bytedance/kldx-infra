@@ -1,7 +1,7 @@
 package file
 
 import (
-	cException "code.byted.org/apaas/goapi_common/exceptions"
+	cException "github.com/bytedance/kldx-common/exceptions"
 	"io/ioutil"
 )
 

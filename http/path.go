@@ -1,8 +1,8 @@
 package http
 
 import (
-	cConstants "code.byted.org/apaas/goapi_common/constants"
-	cUtils "code.byted.org/apaas/goapi_common/utils"
+	cConstants "github.com/bytedance/kldx-common/constants"
+	cUtils "github.com/bytedance/kldx-common/utils"
 	"strings"
 )
 

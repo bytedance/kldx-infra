@@ -1,9 +1,9 @@
 package impl
 
 import (
-	"code.byted.org/apaas/goapi_infra/common/utils"
-	cond "code.byted.org/apaas/goapi_infra/mongodb/condition"
-	"code.byted.org/apaas/goapi_infra/mongodb/structs"
+	"github.com/bytedance/kldx-infra/common/utils"
+	cond "github.com/bytedance/kldx-infra/mongodb/condition"
+	"github.com/bytedance/kldx-infra/mongodb/structs"
 	"testing"
 )
 

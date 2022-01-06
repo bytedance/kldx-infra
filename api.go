@@ -1,9 +1,9 @@
 package infra
 
 import (
-	"code.byted.org/apaas/goapi_infra/file"
-	mongodbImpl "code.byted.org/apaas/goapi_infra/mongodb/impl"
-	"code.byted.org/apaas/goapi_infra/redis"
+	"github.com/bytedance/kldx-infra/file"
+	mongodbImpl "github.com/bytedance/kldx-infra/mongodb/impl"
+	"github.com/bytedance/kldx-infra/redis"
 )
 
 var (

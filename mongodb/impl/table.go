@@ -1,10 +1,10 @@
 package impl
 
 import (
-	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
-	"code.byted.org/apaas/goapi_infra/http/faasinfra"
-	"code.byted.org/apaas/goapi_infra/mongodb"
-	"code.byted.org/apaas/goapi_infra/mongodb/structs"
+	cExceptions "github.com/bytedance/kldx-common/exceptions"
+	"github.com/bytedance/kldx-infra/http/faasinfra"
+	"github.com/bytedance/kldx-infra/mongodb"
+	"github.com/bytedance/kldx-infra/mongodb/structs"
 )
 
 type Table struct {

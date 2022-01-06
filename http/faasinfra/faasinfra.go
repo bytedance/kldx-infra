@@ -2,10 +2,10 @@ package faasinfra
 
 import (
 	"bytes"
-	cConstants "github/kldx/common/constants"
-	cExceptions "github/kldx/common/exceptions"
-	cHttp "github/kldx/common/http"
-	"github/kldx/infra/http"
+	cConstants "github.com/bytedance/kldx-common/constants"
+	cExceptions "github.com/bytedance/kldx-common/exceptions"
+	cHttp "github.com/bytedance/kldx-common/http"
+	"github.com/bytedance/kldx-infra/http"
 	"encoding/json"
 	"fmt"
 	"github.com/tidwall/gjson"
