@@ -1,11 +1,11 @@
 package impl
 
 import (
-	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
-	"code.byted.org/apaas/goapi_infra/http/faasinfra"
-	"code.byted.org/apaas/goapi_infra/mongodb"
-	cond "code.byted.org/apaas/goapi_infra/mongodb/condition"
-	op "code.byted.org/apaas/goapi_infra/mongodb/operator"
+	cExceptions "github.com/bytedance/kldx-common/exceptions"
+	"github.com/bytedance/kldx-infra/http/faasinfra"
+	"github.com/bytedance/kldx-infra/mongodb"
+	cond "github.com/bytedance/kldx-infra/mongodb/condition"
+	op "github.com/bytedance/kldx-infra/mongodb/operator"
 	"reflect"
 )
 

@@ -1,7 +1,7 @@
 package impl
 
 import (
-	"code.byted.org/apaas/goapi_infra/common/utils"
+	"github.com/bytedance/kldx-infra/common/utils"
 	"encoding/json"
 	"testing"
 )

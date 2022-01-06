@@ -1,9 +1,9 @@
 package redis
 
 import (
-	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
-	cHttp "code.byted.org/apaas/goapi_common/http"
-	"code.byted.org/apaas/goapi_infra/http"
+	cExceptions "github.com/bytedance/kldx-common/exceptions"
+	cHttp "github.com/bytedance/kldx-common/http"
+	"github.com/bytedance/kldx-infra/http"
 	"encoding/json"
 	"strconv"
 	"time"

@@ -1,6 +1,6 @@
 package cond
 
-import op "github/kldx/infra/mongodb/operator"
+import op "github.com/bytedance/kldx-infra/mongodb/operator"
 
 type M map[string]interface{}
 

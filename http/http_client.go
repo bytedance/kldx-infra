@@ -1,8 +1,8 @@
 package http
 
 import (
-	cHttp "github/kldx/common/http"
-	"github/kldx/infra/common/utils"
+	cHttp "github.com/bytedance/kldx-common/http"
+	"github.com/bytedance/kldx-infra/common/utils"
 	"net/http"
 	"sync"
 )

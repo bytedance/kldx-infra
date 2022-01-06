@@ -2,10 +2,10 @@ package file
 
 import (
 	"bytes"
-	cException "code.byted.org/apaas/goapi_common/exceptions"
-	"code.byted.org/apaas/goapi_infra/common/constants"
-	http2 "code.byted.org/apaas/goapi_infra/http"
-	"code.byted.org/apaas/goapi_infra/http/faasinfra"
+	cException "github.com/bytedance/kldx-common/exceptions"
+	"github.com/bytedance/kldx-infra/common/constants"
+	http2 "github.com/bytedance/kldx-infra/http"
+	"github.com/bytedance/kldx-infra/http/faasinfra"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
