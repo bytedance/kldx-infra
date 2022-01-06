@@ -1,37 +1,20 @@
-package faasinfra
+package file
 
 import (
 	"bytes"
-	cException "github/kldx/common/exceptions"
-	"github/kldx/infra/common/constants"
-	"github/kldx/infra/structs"
+	cException "code.byted.org/apaas/goapi_common/exceptions"
+	"code.byted.org/apaas/goapi_infra/common/constants"
+	http2 "code.byted.org/apaas/goapi_infra/http"
+	"code.byted.org/apaas/goapi_infra/http/faasinfra"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/url"
-	"sync"
 )
 
-var (
-	httpClientOnce sync.Once
-	httpClient     *http.Client
-)
-
-func getHttpClient() *http.Client {
-	httpClientOnce.Do(func() {
-		httpClient = &http.Client{
-			Transport: &http.Transport{
-				MaxIdleConns:        100,
-				MaxIdleConnsPerHost: 10,
-			},
-		}
-	})
-	return httpClient
-}
-
-func ReadFromURL(targetURL string) ([]byte, error) {
+func readFromURL(targetURL string) ([]byte, error) {
 
 	u, err := url.Parse(targetURL)
 	if err != nil {
@@ -43,7 +26,7 @@ func ReadFromURL(targetURL string) ([]byte, error) {
 		return nil, err
 	}
 
-	rsp, err := getHttpClient().Do(req)
+	rsp, err := http2.GetCommonHttpClient().Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +43,7 @@ func ReadFromURL(targetURL string) ([]byte, error) {
 	return b, err
 }
 
-func UploadWithContent(name string, content []byte, option *structs.FileOption) (*structs.FileUploadResult, error) {
+func uploadWithContent(name string, content []byte, option *Option) (*UploadResult, error) {
 	if len(content) > constants.MaxFileSize {
 		return nil, cException.InvalidParamError("file too large, exceed %v", constants.MaxFileSize)
 	}
@@ -92,14 +75,20 @@ func UploadWithContent(name string, content []byte, option *structs.FileOption) 
 		return nil, err
 	}
 
-	out, err := doRequestFile(writer.FormDataContentType(), body)
+	out, err := faasinfra.DoRequestFile(writer.FormDataContentType(), body)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &structs.FileUploadResult{}
+	res := &fileUploadResult{}
 	if err := json.Unmarshal(out, res); err != nil {
 		return nil, err
 	}
-	return res, nil
+	if res.uploadError == nil {
+		return &UploadResult{
+			ID: res.ID,
+			URL: res.URL,
+		}, nil
+	}
+	return nil, res.uploadError.error()
 }
