@@ -1,7 +1,7 @@
 package impl
 
 import (
-	cExceptions "github/kldx/common/exceptions"
+	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
 )
 
 type OpType int
@@ -10,6 +10,7 @@ const (
 	OpType_Insert OpType = iota + 1
 	OpType_Find
 	OpType_FindOne
+	OpType_Distinct
 	OpType_Delete
 	OpType_Count
 	OpType_Update
@@ -21,6 +22,7 @@ var opTypeString = map[OpType]string{
 	OpType_Insert:    "insert",
 	OpType_Find:      "find",
 	OpType_FindOne:   "findOne",
+	OpType_Distinct:  "distinct",
 	OpType_Delete:    "delete",
 	OpType_Count:     "count",
 	OpType_Update:    "update",
@@ -35,29 +37,28 @@ type MongodbParam struct {
 }
 
 type MongodbArgs struct {
-	Op           string           `json:"op"`
-	Docs         interface{}      `json:"docs,omitempty"`
-	Query        interface{}      `json:"query,omitempty"`
-	Collection   string           `json:"collection,omitempty"`
-	Sort         map[string]int64 `json:"sort,omitempty"`
-	Projection   interface{}      `json:"projection,omitempty"`
-	Project      interface{}      `json:"project,omitempty"`
-	Hint         interface{}      `json:"hint,omitempty"`
-	Skip         int64            `json:"skip,omitempty"`
-	Limit        int64            `json:"limit,omitempty"`
-	ArrayFilters interface{}      `json:"arrayFilters,omitempty"`
-	Upsert       *bool            `json:"upsert,omitempty"`
-	Distinct     string           `json:"distinct,omitempty"`
-	Pipeline     interface{}      `json:"pipeline,omitempty"`
-	Update       interface{}      `json:"update,omitempty"`
-	One          *bool            `json:"one,omitempty"`
+	Op           string                   `json:"op"`
+	Docs         interface{}              `json:"docs,omitempty"`
+	Query        interface{}              `json:"query,omitempty"`
+	Collection   string                   `json:"collection,omitempty"`
+	Sort         map[string]int64         `json:"sort,omitempty"`
+	Projection   interface{}              `json:"projection,omitempty"`
+	Hint         interface{}              `json:"hint,omitempty"`
+	Skip         int64                    `json:"skip,omitempty"`
+	Limit        int64                    `json:"limit,omitempty"`
+	ArrayFilters interface{}              `json:"arrayFilters,omitempty"`
+	Upsert       *bool                    `json:"upsert,omitempty"`
+	Pipeline     []map[string]interface{} `json:"pipeline,omitempty"`
+	Update       interface{}              `json:"update,omitempty"`
+	One          *bool                    `json:"one,omitempty"`
+	// Distinct
+	Key string `json:"key,omitempty"`
+	// aggregate
+	Aggregate bool `json:"aggregate,omitempty"`
 }
 
 func NewMongodbArgs() *MongodbArgs {
-	return &MongodbArgs{
-		Sort:   make(map[string]int64),
-		Update: make(map[string]interface{}),
-	}
+	return &MongodbArgs{}
 }
 
 func NewMongodbParam(tableName string) *MongodbParam {
@@ -72,8 +73,20 @@ func (p *MongodbParam) SetOp(op OpType) {
 	p.Args.Op = opTypeString[op]
 }
 
+func (p *MongodbParam) SetKey(key string) {
+	p.Args.Key = key
+}
+
+func (p *MongodbParam) SetProjection(projection interface{}) {
+	p.Args.Projection = projection
+}
+
 func (p *MongodbParam) SetOne(one bool) {
 	p.Args.One = &one
+}
+
+func (p *MongodbParam) SetAggregate(agg bool) {
+	p.Args.Aggregate = agg
 }
 
 func (p *MongodbParam) SetUpsert(upsert bool) {
@@ -109,6 +122,9 @@ func (p *MongodbParam) SetQuery(condition interface{}) {
 }
 
 func (p *MongodbParam) AddSort(field string, direct int64) {
+	if p.Args.Sort == nil {
+		p.Args.Sort = make(map[string]int64)
+	}
 	p.Args.Sort[field] = direct
 }
 

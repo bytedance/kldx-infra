@@ -1,11 +1,11 @@
 package impl
 
 import (
-	cExceptions "github/kldx/common/exceptions"
-	"github/kldx/infra/http/faasinfra"
-	"github/kldx/infra/mongodb"
-	cond "github/kldx/infra/mongodb/condition"
-	op "github/kldx/infra/mongodb/operator"
+	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
+	"code.byted.org/apaas/goapi_infra/http/faasinfra"
+	"code.byted.org/apaas/goapi_infra/mongodb"
+	cond "code.byted.org/apaas/goapi_infra/mongodb/condition"
+	op "code.byted.org/apaas/goapi_infra/mongodb/operator"
 	"reflect"
 )
 
@@ -119,14 +119,6 @@ func (q *Query) Find(records interface{}) error {
 	return faasinfra.Find(q.MongodbParam, records)
 }
 
-func (q *Query) buildQuery() {
-	if len(q.conditions) == 1 {
-		q.SetQuery(q.conditions[0])
-	} else if len(q.conditions) > 1 {
-		q.SetQuery(cond.M{op.And: q.conditions})
-	}
-}
-
 func (q *Query) FindOne(record interface{}) error {
 	if q.Err != nil {
 		return q.Err
@@ -164,18 +156,6 @@ func (q *Query) Where(condition interface{}, args ...interface{}) mongodb.IQuery
 	return q
 }
 
-func (q *Query) And(elems ...interface{}) mongodb.IQuery {
-	panic("implement me")
-}
-
-func (q *Query) Or(elems ...interface{}) mongodb.IQuery {
-	panic("implement me")
-}
-
-func (q *Query) Nor(elems ...interface{}) mongodb.IQuery {
-	panic("implement me")
-}
-
 func (q *Query) Limit(limit int64) mongodb.IQuery {
 	if q.Err != nil {
 		return q
@@ -190,10 +170,6 @@ func (q *Query) Offset(offset int64) mongodb.IQuery {
 	}
 	q.SetOffset(offset)
 	return q
-}
-
-func (q *Query) Sort(v interface{}) mongodb.IQuery {
-	panic("implement me")
 }
 
 func (q *Query) OrderBy(fields ...string) mongodb.IQuery {
@@ -222,17 +198,33 @@ func (q *Query) Count() (int64, error) {
 	}
 
 	q.SetOp(OpType_Count)
+	q.buildQuery()
 	return faasinfra.Count(q.MongodbParam)
 }
 
-func (q *Query) Distinct(field string, args ...interface{}) mongodb.IQuery {
-	panic("implement me")
+func (q *Query) Distinct(field string, v interface{}) error {
+	if q.Err != nil {
+		return q.Err
+	}
+
+	q.SetOp(OpType_Distinct)
+	q.SetKey(field)
+	return faasinfra.Distinct(q.MongodbParam, v)
 }
 
-func (q *Query) Project(v interface{}) mongodb.IQuery {
-	panic("implement me")
+func (q *Query) Project(projection interface{}) mongodb.IQuery {
+	if q.Err != nil {
+		return q
+	}
+
+	q.SetProjection(projection)
+	return q
 }
 
-func (q *Query) GroupBy(field string, args ...interface{}) mongodb.IAggQuery {
-	panic("implement me")
+func (q *Query) buildQuery() {
+	if len(q.conditions) == 1 {
+		q.SetQuery(q.conditions[0])
+	} else if len(q.conditions) > 1 {
+		q.SetQuery(cond.M{op.And: q.conditions})
+	}
 }

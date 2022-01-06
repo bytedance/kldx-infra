@@ -1,8 +1,8 @@
 package faasinfra
 
 import (
-	cExceptions "github/kldx/common/exceptions"
-	"github/kldx/infra/structs"
+	cExceptions "code.byted.org/apaas/goapi_common/exceptions"
+	"code.byted.org/apaas/goapi_infra/mongodb/structs"
 	"encoding/json"
 )
 
@@ -78,6 +78,20 @@ func Count(param interface{}) (int64, error) {
 	}
 
 	return result.Count, nil
+}
+
+func Distinct(param interface{}, v interface{}) error {
+	data, err := doRequestMongodb(param)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(data, &v)
+	if err != nil {
+		return cExceptions.InternalError("Count failed, err: %v", err)
+	}
+
+	return nil
 }
 
 func Update(param interface{}) error {
