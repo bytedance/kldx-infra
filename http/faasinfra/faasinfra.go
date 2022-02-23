@@ -6,8 +6,6 @@ import (
 	cExceptions "github.com/bytedance/kldx-common/exceptions"
 	cHttp "github.com/bytedance/kldx-common/http"
 	"github.com/bytedance/kldx-infra/http"
-	"encoding/json"
-	"fmt"
 	"github.com/tidwall/gjson"
 )
 
@@ -15,7 +13,6 @@ func errorWrapper(body []byte, err error) ([]byte, error) {
 	if err != nil {
 		return nil, cExceptions.ErrorWrap(err)
 	}
-
 	code := gjson.GetBytes(body, "code").String()
 	msg := gjson.GetBytes(body, "msg").String()
 	if !http.HasError(code) {
@@ -25,21 +22,18 @@ func errorWrapper(body []byte, err error) ([]byte, error) {
 		}
 		return []byte(data.Raw), nil
 	} else if http.IsSysError(code) {
-		return nil, cExceptions.InternalError("request openapi failed, code: %s, msg: %s", code, msg)
+		return nil, cExceptions.InternalError("request faaSInfra failed, code: %s, msg: %s", code, msg)
 	} else {
-		return nil, cExceptions.InvalidParamError("request openapi failed, code: %s, msg: %s", code, msg)
+		return nil, cExceptions.InvalidParamError("request faaSInfra failed, code: %s, msg: %s", code, msg)
 	}
 }
 
 func doRequestMongodb(param interface{}) ([]byte, error) {
-	pStr, _ := json.Marshal(param)
-	fmt.Println(string(pStr))
-
-	return errorWrapper(http.GetFaaSInfraClient().PostJson(http.GetFaaSInfraPathMongodb(), nil, param, cHttp.AppTokenMiddleware, http.FaaSInfraMiddleware))
+	return errorWrapper(http.GetFaaSInfraClient().PostBson(http.GetFaaSInfraPathMongodb(), nil, param, cHttp.AppTokenMiddleware, cHttp.TenantAndUserMiddleware, cHttp.ServiceIDMiddleware))
 }
 
 func DoRequestFile(contentType string, body *bytes.Buffer) ([]byte, error) {
 	return errorWrapper(http.GetFaaSInfraClient().PostFormData(http.GetFaaSInfraPathFile(), map[string][]string{
 		cConstants.HttpHeaderKey_ContentType: {contentType},
-	}, body, cHttp.AppTokenMiddleware, http.FaaSInfraMiddleware))
+	}, body, cHttp.AppTokenMiddleware, cHttp.TenantAndUserMiddleware, cHttp.ServiceIDMiddleware))
 }

@@ -1,10 +1,10 @@
 package redis
 
 import (
+	"encoding/json"
 	cExceptions "github.com/bytedance/kldx-common/exceptions"
 	cHttp "github.com/bytedance/kldx-common/http"
 	"github.com/bytedance/kldx-infra/http"
-	"encoding/json"
 	"strconv"
 	"time"
 )
@@ -44,7 +44,7 @@ type redisArgumentList struct {
 
 // RedisCmdExecution Request
 func (c *baseCmd) execute() {
-	data, e := http.GetFaaSInfraClient().PostJson(http.GetFaaSInfraPathRedis(), nil, redisArgumentList{Cmd: c.name, Args: c.args}, cHttp.AppTokenMiddleware, http.FaaSInfraMiddleware)
+	data, e := http.GetFaaSInfraClient().PostJson(http.GetFaaSInfraPathRedis(), nil, redisArgumentList{Cmd: c.name, Args: c.args}, cHttp.AppTokenMiddleware, cHttp.TenantAndUserMiddleware, cHttp.ServiceIDMiddleware)
 	if e != nil {
 		c.err = cExceptions.ErrorWrap(e)
 		return
