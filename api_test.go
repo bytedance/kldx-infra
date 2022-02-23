@@ -6,7 +6,15 @@ import (
 	"testing"
 )
 
-func TestMongodb(t *testing.T) {
+func TestMongodb_Create(t *testing.T) {
+	create, err := MongoDB.Table("goods").Create(map[string]interface{}{"hello": "world", "qty": 1})
+	if err != nil {
+		panic(err)
+	}
+	utils.PrintLog(create)
+}
+
+func TestMongodb_Find(t *testing.T) {
 	var result interface{}
 	err := MongoDB.Table("goods").Where(cond.M{
 		"qty": cond.Gt(0),

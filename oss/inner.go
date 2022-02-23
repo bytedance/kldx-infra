@@ -1,13 +1,15 @@
-package file
+package oss
 
 import (
 	"bytes"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	cException "github.com/bytedance/kldx-common/exceptions"
 	"github.com/bytedance/kldx-infra/common/constants"
 	http2 "github.com/bytedance/kldx-infra/http"
 	"github.com/bytedance/kldx-infra/http/faasinfra"
-	"encoding/json"
-	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -79,16 +81,21 @@ func uploadWithContent(name string, content []byte, option *Option) (*UploadResu
 	if err != nil {
 		return nil, err
 	}
-
 	res := &fileUploadResult{}
-	if err := json.Unmarshal(out, res); err != nil {
+	dest, err := base64.StdEncoding.DecodeString(string(out))
+	if err != nil {
+		return nil, fmt.Errorf("result decode err: %v", err)
+	}
+	if err := bson.Unmarshal(dest, &res); err != nil {
 		return nil, err
 	}
-	if res.uploadError == nil {
+
+	if res.Data != nil && res.Data.uploadError == nil {
 		return &UploadResult{
-			ID: res.ID,
-			URL: res.URL,
+			ID:  res.Data.ID,
+			URL: res.Data.URL,
 		}, nil
 	}
-	return nil, res.uploadError.error()
+
+	return nil, res.Data.uploadError.error()
 }

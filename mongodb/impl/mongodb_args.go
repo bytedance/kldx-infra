@@ -31,9 +31,9 @@ var opTypeString = map[OpType]string{
 }
 
 type MongodbParam struct {
-	TableName string       `json:"tableName"`
-	Args      *MongodbArgs `json:"args"`
-	Err       error        `json:"-"`
+	TableName string       `json:"tableName" bson:"tableName"`
+	Args      *MongodbArgs `json:"args" bson:"args"`
+	Err       error        `json:"-" bson:"-"`
 }
 
 type MongodbArgs struct {
