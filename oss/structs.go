@@ -1,11 +1,10 @@
-package file
+package oss
 
 import (
 	"errors"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-// file
 
 type Option struct {
 	Type   string `json:"type"`   // http content type
@@ -13,8 +12,8 @@ type Option struct {
 }
 
 type UploadResult struct {
-	ID  string `json:"id,omitempty"`
-	URL string `json:"url,omitempty"`
+	ID  primitive.ObjectID `json:"id,omitempty"`
+	URL string             `json:"url,omitempty"`
 }
 
 type uploadError struct {
@@ -33,7 +32,9 @@ func (e uploadError) error() error {
 }
 
 type fileUploadResult struct {
-	ID  string `json:"id,omitempty"`
-	URL string `json:"url,omitempty"`
-	*uploadError
+	Data *struct {
+		ID  primitive.ObjectID `json:"id,omitempty" bson:"id,omitempty"`
+		URL string             `json:"url,omitempty" bson:"url,omitempty"`
+		*uploadError
+	} `json:"data" bson:"data"`
 }

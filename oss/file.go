@@ -1,4 +1,4 @@
-package file
+package oss
 
 import (
 	cException "github.com/bytedance/kldx-common/exceptions"
