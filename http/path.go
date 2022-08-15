@@ -1,15 +1,16 @@
 package http
 
 import (
+	"strings"
+
 	cConstants "github.com/bytedance/kldx-common/constants"
 	cUtils "github.com/bytedance/kldx-common/utils"
-	"strings"
 )
 
 const (
-	FaaSInfraPathMongodb = "/resource/v1/namespaces/:namespace/db"
-	FaaSInfraPathRedis   = "/resource/v1/namespaces/:namespace/cache"
-	FaaSInfraPathFile  = "/resource/v1/namespaces/:namespace/file"
+	FaaSInfraPathMongodb = "/resource/v3/namespaces/:namespace/db"
+	FaaSInfraPathRedis   = "/resource/v2/namespaces/:namespace/cache"
+	FaaSInfraPathFile  = "/resource/v2/namespaces/:namespace/file"
 )
 
 func GetFaaSInfraPathMongodb() string {
