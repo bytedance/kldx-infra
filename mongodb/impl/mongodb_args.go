@@ -31,30 +31,30 @@ var opTypeString = map[OpType]string{
 }
 
 type MongodbParam struct {
-	TableName string       `json:"tableName" bson:"tableName"`
-	Args      *MongodbArgs `json:"args" bson:"args"`
-	Err       error        `json:"-" bson:"-"`
+	TableName string       `bson:"tableName" json:"tableName"`
+	Args      *MongodbArgs `bson:"args" json:"args"`
+	Err       error        `bson:"-" json:"-"`
 }
 
 type MongodbArgs struct {
-	Op           string                   `json:"op"`
-	Docs         interface{}              `json:"docs,omitempty"`
-	Query        interface{}              `json:"query,omitempty"`
-	Collection   string                   `json:"collection,omitempty"`
-	Sort         map[string]int64         `json:"sort,omitempty"`
-	Projection   interface{}              `json:"projection,omitempty"`
-	Hint         interface{}              `json:"hint,omitempty"`
-	Skip         int64                    `json:"skip,omitempty"`
-	Limit        int64                    `json:"limit,omitempty"`
-	ArrayFilters interface{}              `json:"arrayFilters,omitempty"`
-	Upsert       *bool                    `json:"upsert,omitempty"`
-	Pipeline     []map[string]interface{} `json:"pipeline,omitempty"`
-	Update       interface{}              `json:"update,omitempty"`
-	One          *bool                    `json:"one,omitempty"`
+	Op           string                   `bson:"op" json:"op"`
+	Docs         interface{}              `bson:"docs,omitempty" json:"docs,omitempty"`
+	Query        interface{}              `bson:"query,omitempty" json:"query,omitempty"`
+	Collection   string                   `bson:"collection,omitempty" json:"collection,omitempty"`
+	Sort         map[string]int64         `bson:"sort,omitempty" json:"sort,omitempty"`
+	Projection   interface{}              `bson:"projection,omitempty" json:"projection,omitempty"`
+	Hint         interface{}              `bson:"hint,omitempty" json:"hint,omitempty"`
+	Skip         int64                    `bson:"skip,omitempty" json:"skip,omitempty"`
+	Limit        int64                    `bson:"limit,omitempty" json:"limit,omitempty"`
+	ArrayFilters interface{}              `bson:"arrayFilters,omitempty" json:"arrayFilters,omitempty"`
+	Upsert       *bool                    `bson:"upsert,omitempty" json:"upsert,omitempty"`
+	Pipeline     []map[string]interface{} `bson:"pipeline,omitempty" json:"pipeline,omitempty"`
+	Update       interface{}              `bson:"update,omitempty" json:"update,omitempty"`
+	One          *bool                    `bson:"one,omitempty" json:"one,omitempty"`
 	// Distinct
-	Key string `json:"key,omitempty"`
+	Key string `bson:"key,omitempty" json:"key,omitempty"`
 	// aggregate
-	Aggregate bool `json:"aggregate,omitempty"`
+	Aggregate bool `bson:"aggregate,omitempty" json:"aggregate,omitempty"`
 }
 
 func NewMongodbArgs() *MongodbArgs {

@@ -1,12 +1,14 @@
 package impl
 
 import (
+	"context"
+	"reflect"
+
 	cExceptions "github.com/bytedance/kldx-common/exceptions"
 	"github.com/bytedance/kldx-infra/http/faasinfra"
 	"github.com/bytedance/kldx-infra/mongodb"
 	cond "github.com/bytedance/kldx-infra/mongodb/condition"
 	op "github.com/bytedance/kldx-infra/mongodb/operator"
-	"reflect"
 )
 
 const (
@@ -22,12 +24,12 @@ type Query struct {
 func NewQuery(tableName string) *Query {
 	q := &Query{MongodbParam: &MongodbParam{
 		TableName: tableName,
-		Args: NewMongodbArgs(),
+		Args:      NewMongodbArgs(),
 	}}
 	return q
 }
 
-func (q *Query) Update(record interface{}) error {
+func (q *Query) Update(ctx context.Context, record interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
@@ -45,10 +47,10 @@ func (q *Query) Update(record interface{}) error {
 	q.SetOne(true)
 	q.SetUpsert(false)
 	q.buildQuery()
-	return faasinfra.Update(q.MongodbParam)
+	return faasinfra.Update(ctx, q.MongodbParam)
 }
 
-func (q *Query) Upsert(record interface{}) error {
+func (q *Query) Upsert(ctx context.Context, record interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
@@ -66,10 +68,10 @@ func (q *Query) Upsert(record interface{}) error {
 	q.SetOne(true)
 	q.SetUpsert(true)
 	q.buildQuery()
-	return faasinfra.Update(q.MongodbParam)
+	return faasinfra.Update(ctx, q.MongodbParam)
 }
 
-func (q *Query) BatchUpdate(record interface{}) error {
+func (q *Query) BatchUpdate(ctx context.Context, record interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
@@ -87,46 +89,46 @@ func (q *Query) BatchUpdate(record interface{}) error {
 	q.SetOne(false)
 	q.SetUpsert(false)
 	q.buildQuery()
-	return faasinfra.Update(q.MongodbParam)
+	return faasinfra.Update(ctx, q.MongodbParam)
 }
 
-func (q *Query) Delete() error {
+func (q *Query) Delete(ctx context.Context) error {
 	if q.Err != nil {
 		return q.Err
 	}
 	q.SetOp(OpType_Delete)
 	q.SetOne(true)
 	q.buildQuery()
-	return faasinfra.Delete(q.MongodbParam)
+	return faasinfra.Delete(ctx, q.MongodbParam)
 }
 
-func (q *Query) BatchDelete() error {
+func (q *Query) BatchDelete(ctx context.Context) error {
 	if q.Err != nil {
 		return q.Err
 	}
 	q.SetOp(OpType_Delete)
 	q.SetOne(false)
 	q.buildQuery()
-	return faasinfra.Delete(q.MongodbParam)
+	return faasinfra.Delete(ctx, q.MongodbParam)
 }
 
-func (q *Query) Find(records interface{}) error {
+func (q *Query) Find(ctx context.Context, records interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
 	q.SetOp(OpType_Find)
 	q.buildQuery()
-	return faasinfra.Find(q.MongodbParam, records)
+	return faasinfra.Find(ctx, q.MongodbParam, records)
 }
 
-func (q *Query) FindOne(record interface{}) error {
+func (q *Query) FindOne(ctx context.Context, record interface{}) error {
 	if q.Err != nil {
 		return q.Err
 	}
 	q.SetOp(OpType_FindOne)
 	q.SetLimit(1)
 	q.buildQuery()
-	return faasinfra.FindOne(q.MongodbParam, record)
+	return faasinfra.FindOne(ctx, q.MongodbParam, record)
 }
 
 func (q *Query) Where(condition interface{}, args ...interface{}) mongodb.IQuery {
@@ -192,25 +194,25 @@ func (q *Query) OrderByDesc(fields ...string) mongodb.IQuery {
 	return q
 }
 
-func (q *Query) Count() (int64, error) {
+func (q *Query) Count(ctx context.Context) (int64, error) {
 	if q.Err != nil {
 		return 0, q.Err
 	}
 
 	q.SetOp(OpType_Count)
 	q.buildQuery()
-	return faasinfra.Count(q.MongodbParam)
+	return faasinfra.Count(ctx, q.MongodbParam)
 }
 
-func (q *Query) Distinct(field string, v interface{}) error {
-	if q.Err != nil {
-		return q.Err
-	}
-
-	q.SetOp(OpType_Distinct)
-	q.SetKey(field)
-	return faasinfra.Distinct(q.MongodbParam, v)
-}
+//func (q *Query) Distinct(ctx context.Context, field string, v interface{}) error {
+//	if q.Err != nil {
+//		return q.Err
+//	}
+//
+//	q.SetOp(OpType_Distinct)
+//	q.SetKey(field)
+//	return faasinfra.Distinct(ctx, q.MongodbParam, v)
+//}
 
 func (q *Query) Project(projection interface{}) mongodb.IQuery {
 	if q.Err != nil {

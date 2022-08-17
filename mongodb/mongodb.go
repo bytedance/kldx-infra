@@ -1,6 +1,9 @@
 package mongodb
 
 import (
+	"context"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"github.com/bytedance/kldx-infra/mongodb/structs"
 )
 
@@ -11,8 +14,8 @@ type IMongodb interface {
 // 表
 type ITable interface {
 	// 创建
-	Create(record interface{}) (*structs.RecordOnlyId, error)
-	BatchCreate(records interface{}) ([]string, error)
+	Create(ctx context.Context, record interface{}) (*structs.RecordOnlyId, error)
+	BatchCreate(ctx context.Context, records interface{}) ([]primitive.ObjectID, error)
 
 	// 条件查询、条件更新、条件删除
 	Where(condition interface{}, args ...interface{}) IQuery
@@ -24,32 +27,33 @@ type ITable interface {
 // 查询
 type IQuery interface {
 	// 更新
-	Update(record interface{}) error
-	Upsert(record interface{}) error
-	BatchUpdate(record interface{}) error
+	Update(ctx context.Context, record interface{}) error
+	Upsert(ctx context.Context, record interface{}) error
+	BatchUpdate(ctx context.Context, record interface{}) error
 
 	// 删除
-	Delete() error
-	BatchDelete() error
+	Delete(ctx context.Context, ) error
+	BatchDelete(ctx context.Context, ) error
 
 	// 查询
-	Find(v interface{}) error
-	FindOne(v interface{}) error
+	Find(ctx context.Context, v interface{}) error
+	FindOne(ctx context.Context, v interface{}) error
+
+	Count(ctx context.Context, ) (int64, error)
+	//Distinct(ctx context.Context, field string, v interface{}) error
 
 	Where(condition interface{}, args ...interface{}) IQuery
 	Limit(limit int64) IQuery
 	Offset(offset int64) IQuery
 	OrderBy(fields ...string) IQuery
 	OrderByDesc(fields ...string) IQuery
-	Count() (int64, error)
-	Distinct(field string, v interface{}) error
 	Project(v interface{}) IQuery
 }
 
 // 聚合查询
 type IAggQuery interface {
-	Find(records interface{}) error
-	FindOne(record interface{}) error
+	Find(ctx context.Context, records interface{}) error
+	FindOne(ctx context.Context, record interface{}) error
 
 	// 分组
 	GroupBy(field interface{}, alias ...interface{}) IAggQuery

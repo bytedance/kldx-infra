@@ -1,8 +1,9 @@
 package faasinfra
 
 import (
-	"bytes"
-	cConstants "github.com/bytedance/kldx-common/constants"
+	"context"
+	"encoding/base64"
+
 	cExceptions "github.com/bytedance/kldx-common/exceptions"
 	cHttp "github.com/bytedance/kldx-common/http"
 	"github.com/bytedance/kldx-infra/http"
@@ -28,12 +29,10 @@ func errorWrapper(body []byte, err error) ([]byte, error) {
 	}
 }
 
-func doRequestMongodb(param interface{}) ([]byte, error) {
-	return errorWrapper(http.GetFaaSInfraClient().PostBson(http.GetFaaSInfraPathMongodb(), nil, param, cHttp.AppTokenMiddleware, cHttp.TenantAndUserMiddleware, cHttp.ServiceIDMiddleware))
-}
-
-func DoRequestFile(contentType string, body *bytes.Buffer) ([]byte, error) {
-	return errorWrapper(http.GetFaaSInfraClient().PostFormData(http.GetFaaSInfraPathFile(), map[string][]string{
-		cConstants.HttpHeaderKey_ContentType: {contentType},
-	}, body, cHttp.AppTokenMiddleware, cHttp.TenantAndUserMiddleware, cHttp.ServiceIDMiddleware))
+func doRequestMongodb(ctx context.Context, param interface{}) ([]byte, error) {
+	data, err := errorWrapper(http.GetFaaSInfraClient().PostBson(ctx, http.GetFaaSInfraPathMongodb(), nil, param, cHttp.AppTokenMiddleware, cHttp.TenantAndUserMiddleware, cHttp.ServiceIDMiddleware))
+	if err != nil {
+		return data, err
+	}
+	return base64.StdEncoding.DecodeString(string(data))
 }

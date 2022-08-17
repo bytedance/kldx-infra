@@ -1,13 +1,7 @@
 package structs
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type RecordOnlyId struct {
-	Id string `json:"_id"`
-}
-
-type BatchCreateResult struct {
-	Ids []string `json:"_ids"`
-}
-
-type CountResult struct {
-	Count int64 `json:"count"`
+	ID primitive.ObjectID `json:"_id" bson:"_id"`
 }

@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -11,11 +12,21 @@ import (
 
 var (
 	redisCli *Redis
-	ctx = context.Background()
+	ctx      = context.Background()
 )
 
 func Init() {
 	redisCli = &Redis{}
+	// TODO setEnv
+	_ = os.Setenv("KTenantName", "zhouzilong")
+	_ = os.Setenv("KNamespace", "package1__c")
+	_ = os.Setenv("KSvcID", "ttboeuag9")
+	_ = os.Setenv("KClientID", "f932df96638080fda575f7df245b18964914ccb9dae5476da2e085e06ab186c5")
+	_ = os.Setenv("KClientSecret", "128c60ec4f480ab45a3396ddb218641d820e7c965a692917c1cf8445b71be2866c6fea1d0f6f9486e5aa468b16c0ae20")
+	_ = os.Setenv("KOpenApiDomain", "http://boe-apaas-oapi-dev.byted.org")
+	_ = os.Setenv("KFaaSInfraDomain", "http://apaas-faasinfra-dev.byted.org")
+	//_ = os.Setenv("KFaaSInfraDomain", "http://10.94.93.221:6789")
+	//_ = os.Setenv("KFaaSInfraDomain", "http://127.0.0.1:6789")
 }
 
 func TestMain(m *testing.M) {
@@ -24,7 +35,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetNil(t *testing.T) {
-	cmd := redisCli.Get(ctx,"NilKey")
+	cmd := redisCli.Get(ctx, "NilKey")
 	v, e := cmd.Result()
 	fmt.Printf("Res: %v, Err: %v\n", v, e)
 	assert.Equal(t, Nil, e)
@@ -62,16 +73,16 @@ func Test_AB_PExpire(t *testing.T) {
 	assert.Empty(t, e)
 }
 
-func Test_AB_PExpireAt(t *testing.T) {
-	cmd := redisCli.PExpireAt(ctx, "TestKey", time.Now().Add(6*60*time.Minute))
+func Test_AB_Persist(t *testing.T) {
+	cmd := redisCli.Persist(ctx, "TestKey")
 	v, e := cmd.Result()
 	fmt.Printf("Res: %v, Err: %v\n", v, e)
 	assert.Equal(t, true, v)
 	assert.Empty(t, e)
 }
 
-func Test_AB_Persist(t *testing.T) {
-	cmd := redisCli.Persist(ctx, "TestKey")
+func Test_AB_PExpireAt(t *testing.T) {
+	cmd := redisCli.PExpireAt(ctx, "TestKey", time.Now().Add(6*60*time.Minute))
 	v, e := cmd.Result()
 	fmt.Printf("Res: %v, Err: %v\n", v, e)
 	assert.Equal(t, true, v)
@@ -81,16 +92,16 @@ func Test_AB_Persist(t *testing.T) {
 func Test_AC_TTL(t *testing.T) {
 	cmd := redisCli.TTL(ctx, "TestKey")
 	v, e := cmd.Result()
-	fmt.Printf("Res: %v s, Err: %v\n", v.Milliseconds()/1000, e)
-	assert.Equal(t, true, v.Milliseconds()/1000 > 0)
+	fmt.Printf("Res: %v s, Err: %v\n", v, e)
+	assert.Equal(t, true, v > 0)
 	assert.Empty(t, e)
 }
 
 func Test_AC_PTTL(t *testing.T) {
 	cmd := redisCli.PTTL(ctx, "TestKey")
 	v, e := cmd.Result()
-	fmt.Printf("Res: %v ms, Err: %v\n", v.Milliseconds(), e)
-	assert.Equal(t, true, v.Milliseconds() > 0)
+	fmt.Printf("Res: %v ms, Err: %v\n", v, e)
+	assert.Equal(t, true, v > 0)
 	assert.Empty(t, e)
 }
 
@@ -106,7 +117,7 @@ func Test_AE_Append(t *testing.T) {
 	cmd := redisCli.Append(ctx, "TestKey", " World")
 	v, e := cmd.Result()
 	fmt.Printf("Res: %v, Err: %v\n", v, e)
-	assert.Equal(t, 11, v)
+	assert.Equal(t, int64(11), v)
 	assert.Empty(t, e)
 }
 
@@ -122,7 +133,7 @@ func Test_AF_GetRange(t *testing.T) {
 	cmd := redisCli.GetRange(ctx, "TestKey", 0, 5)
 	v, e := cmd.Result()
 	fmt.Printf("Res: %v, Err: %v\n", v, e)
-	assert.Equal(t, "Hello", v)
+	assert.Equal(t, "Hello ", v)
 	assert.Empty(t, e)
 }
 
@@ -262,23 +273,32 @@ func Test_DC_BitCount(t *testing.T) {
 }
 
 func Test_EA_HSet(t *testing.T) {
-	cmd := redisCli.HSet(ctx, "HashKey", map[string]interface{}{"field1": "value1", "field2": "value2", "field3": 1})
-	redisCli.Expire(ctx, "HashKey", 6*60*time.Minute)
+	cmd := redisCli.HSet(ctx, "HashKey", "field", "value")
+	redisCli.Expire(ctx, "HashKey", 5*time.Minute)
 	v, e := cmd.Result()
 	fmt.Printf("Res: %v, Err: %v\n", v, e)
 	assert.Empty(t, e)
 }
 
 func Test_EB_HGet(t *testing.T) {
-	cmd := redisCli.HGet(ctx, "HashKey", "field1")
+	cmd := redisCli.HGet(ctx, "HashKey", "field")
 	v, e := cmd.Result()
 	fmt.Printf("Res: %v, Err: %v\n", v, e)
-	assert.Equal(t, "value1", v)
+	assert.Equal(t, "value", v)
+	assert.Empty(t, e)
+}
+
+func Test_EB_HMSet(t *testing.T) {
+	cmd := redisCli.HMSet(ctx, "HashKey", map[string]interface{}{"field1": "value1", "field2": "value2", "field3": 1})
+	redisCli.Expire(ctx, "HashKey", 5*time.Minute)
+	v, e := cmd.Result()
+	fmt.Printf("Res: %v, Err: %v\n", v, e)
+	assert.Equal(t, true, len(v) > 0)
 	assert.Empty(t, e)
 }
 
 func Test_EB_HMGet(t *testing.T) {
-	cmd := redisCli.HMGet(ctx, "HashKey", "field1", "field2")
+	cmd := redisCli.HMGet(ctx, "HashKey", "field1", "field2", "field3")
 	v, e := cmd.Result()
 	fmt.Printf("Res: %v, Err: %v\n", v, e)
 	assert.Equal(t, true, len(v) > 0)
@@ -639,6 +659,7 @@ func Test_HB_ZIncr(t *testing.T) {
 }
 
 func Test_HB_ZIncrNX(t *testing.T) {
+	fmt.Println(redisCli.ZRange(ctx, "{ZSet}Key", 0, -1).Val())
 	cmd := redisCli.ZIncrNX(ctx, "{ZSet}Key", &Z{Score: 5, Member: "V8"})
 	v, e := cmd.Result()
 	fmt.Printf("Res: %v, Err: %v\n", v, e)
@@ -668,7 +689,7 @@ func Test_HC_ZCount(t *testing.T) {
 
 func Test_HD_ZInterStore(t *testing.T) {
 	cmd := redisCli.ZInterStore(ctx, "{ZSet}Key_4", &ZStore{
-		Keys:      []string{"a", "b"},
+		Keys:      []string{"{ZSet}a", "{ZSet}b"},
 		Weights:   []float64{1, 2},
 		Aggregate: "",
 	})
@@ -797,7 +818,7 @@ func Test_HF_ZScore(t *testing.T) {
 
 func Test_HF_ZUnionStore(t *testing.T) {
 	cmd := redisCli.ZUnionStore(ctx, "{ZSet}Key_6", &ZStore{
-		Keys:      []string{"a", "b"},
+		Keys:      []string{"{ZSet}a", "{ZSet}b"},
 		Weights:   []float64{1, 2},
 		Aggregate: "",
 	})
@@ -828,4 +849,8 @@ func Test_IC_PFMerge(t *testing.T) {
 	fmt.Printf("Res: %v, Err: %v\n", v, e)
 	assert.Equal(t, "OK", v)
 	assert.Empty(t, e)
+}
+
+func Test_After_Del(t *testing.T) {
+	redisCli.Del(ctx, "{Set}Key", "{Set}Key_4", "{Set}Key_5", "{ZSet}Key", "{ZSet}Key_4", "{ZSet}Key_6", "{PF}Key", "{PF}Key_1")
 }

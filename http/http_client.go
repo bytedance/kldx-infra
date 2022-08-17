@@ -1,10 +1,12 @@
 package http
 
 import (
-	cHttp "github.com/bytedance/kldx-common/http"
-	"github.com/bytedance/kldx-infra/common/utils"
 	"net/http"
 	"sync"
+	"time"
+
+	cHttp "github.com/bytedance/kldx-common/http"
+	cUtils "github.com/bytedance/kldx-common/utils"
 )
 
 var (
@@ -13,17 +15,16 @@ var (
 )
 
 func GetFaaSInfraClient() *cHttp.HttpClient {
-	conf := utils.GetFaasinfraClientConf()
 	fiOnce.Do(func() {
 		fiClient = &cHttp.HttpClient{
 			Client: http.Client{
 				Transport: &http.Transport{
-					MaxIdleConns:        conf.MaxIdleConns,
-					MaxIdleConnsPerHost: conf.MaxIdleConnsPerHost,
-					IdleConnTimeout:     conf.IdleConnTimeout,
+					MaxIdleConns:        100,
+					MaxIdleConnsPerHost: 10,
+					IdleConnTimeout:     10 * time.Second,
 				},
 			},
-			Url: conf.Url,
+			Url: cUtils.GetFaasinfraUrl(),
 		}
 	})
 	return fiClient
@@ -45,4 +46,3 @@ func GetCommonHttpClient() *http.Client {
 	})
 	return httpClient
 }
-

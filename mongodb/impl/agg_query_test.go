@@ -1,9 +1,10 @@
 package impl
 
 import (
+	"testing"
+
 	"github.com/bytedance/kldx-infra/common/utils"
 	cond "github.com/bytedance/kldx-infra/mongodb/condition"
-	"testing"
 )
 
 // GroupBy
@@ -12,7 +13,7 @@ func TestQuery_GroupBy_Push(t *testing.T) {
 	T := db.Table("goods")
 
 	var results interface{}
-	err := T.GroupBy("info.city", "城市").Push(map[string]string{"商品": "item", "数量": "qty"}, "列表").Find(&results)
+	err := T.GroupBy("info.city", "城市").Push(map[string]string{"商品": "item", "数量": "qty"}, "列表").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -24,7 +25,7 @@ func TestQuery_GroupBy_NoPush(t *testing.T) {
 	T := db.Table("goods")
 
 	var results interface{}
-	err := T.GroupBy("info.city", "城市").Find(&results)
+	err := T.GroupBy("info.city", "城市").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +37,7 @@ func TestQuery_GroupBy_NoAlias(t *testing.T) {
 	T := db.Table("goods")
 
 	var results interface{}
-	err := T.GroupBy("info.city").Push(map[string]string{"商品": "item", "数量": "qty"}, "列表").Find(&results)
+	err := T.GroupBy("info.city").Push(map[string]string{"商品": "item", "数量": "qty"}, "列表").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +50,7 @@ func TestQuery_GroupBy_MulFields(t *testing.T) {
 	T := db.Table("goods")
 
 	var results interface{}
-	err := T.GroupBy([]string{"item", "qty"}, "item-qty").Find(&results)
+	err := T.GroupBy([]string{"item", "qty"}, "item-qty").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +63,7 @@ func TestQuery_GroupBy_First_SingleField(t *testing.T) {
 	T := db.Table("goods")
 
 	var results interface{}
-	err := T.GroupBy("info.city", "city").First("qty", "count").Find(&results)
+	err := T.GroupBy("info.city", "city").First("qty", "count").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -74,7 +75,7 @@ func TestQuery_GroupBy_First_MulFields(t *testing.T) {
 	T := db.Table("goods")
 
 	var results interface{}
-	err := T.GroupBy("info.city", "city").First([]string{"item", "qty"}, "first-item").Find(&results)
+	err := T.GroupBy("info.city", "city").First([]string{"item", "qty"}, "first-item").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -87,7 +88,7 @@ func TestQuery_GroupBy_Sum(t *testing.T) {
 	T := db.Table("goods")
 
 	var results []interface{}
-	err := T.GroupBy("info.city", "city").Sum("qty", "total").Find(&results)
+	err := T.GroupBy("info.city", "city").Sum("qty", "total").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -100,7 +101,7 @@ func TestQuery_GroupByAvg(t *testing.T) {
 	T := db.Table("goods")
 
 	var results []interface{}
-	err := T.GroupBy("info.city", "city").Avg("qty", "avg").Find(&results)
+	err := T.GroupBy("info.city", "city").Avg("qty", "avg").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -113,7 +114,7 @@ func TestQuery_StdDevPop(t *testing.T) {
 	T := db.Table("goods")
 
 	var results []interface{}
-	err := T.GroupBy("info.city", "city").StdDevPop("qty", "stdDevPop").Find(&results)
+	err := T.GroupBy("info.city", "city").StdDevPop("qty", "stdDevPop").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -126,7 +127,7 @@ func TestQuery_GroupByStdDevSamp(t *testing.T) {
 	T := db.Table("goods")
 
 	var results []interface{}
-	err := T.GroupBy("info.city", "city").StdDevSamp("qty", "stdDevSamp").Find(&results)
+	err := T.GroupBy("info.city", "city").StdDevSamp("qty", "stdDevSamp").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -139,7 +140,7 @@ func TestQuery_GroupByAddToSet(t *testing.T) {
 	T := db.Table("goods")
 
 	var results []interface{}
-	err := T.GroupBy("info.city", "city").AddToSet("item", "items").Find(&results)
+	err := T.GroupBy("info.city", "city").AddToSet("item", "items").Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}
@@ -151,7 +152,7 @@ func TestQuery_GroupBy_Having(t *testing.T) {
 	T := db.Table("goods")
 
 	var results interface{}
-	err := T.GroupBy("info.city", "city").Push([]string{"item", "qty"}, "list").Having(cond.M{"qty": cond.Gt(40)}).Find(&results)
+	err := T.GroupBy("info.city", "city").Push([]string{"item", "qty"}, "list").Having(cond.M{"qty": cond.Gt(40)}).Find(ctx, &results)
 	if err != nil {
 		panic(err)
 	}

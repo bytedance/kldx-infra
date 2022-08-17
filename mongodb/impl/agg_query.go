@@ -1,12 +1,14 @@
 package impl
 
 import (
+	"context"
+	"reflect"
+
 	cExceptions "github.com/bytedance/kldx-common/exceptions"
 	"github.com/bytedance/kldx-infra/http/faasinfra"
 	"github.com/bytedance/kldx-infra/mongodb"
 	cond "github.com/bytedance/kldx-infra/mongodb/condition"
 	op "github.com/bytedance/kldx-infra/mongodb/operator"
-	"reflect"
 )
 
 type AggQuery struct {
@@ -27,23 +29,23 @@ func NewAggQuery(tableName string) *AggQuery {
 	}
 }
 
-func (a *AggQuery) Find(records interface{}) error {
+func (a *AggQuery) Find(ctx context.Context, records interface{}) error {
 	if a.Err != nil {
 		return a.Err
 	}
 	a.SetOp(OpType_Aggregate)
 	a.buildPipeline()
-	return faasinfra.Find(a.MongodbParam, records)
+	return faasinfra.Find(ctx, a.MongodbParam, records)
 }
 
-func (a *AggQuery) FindOne(record interface{}) error {
+func (a *AggQuery) FindOne(ctx context.Context, record interface{}) error {
 	if a.Err != nil {
 		return a.Err
 	}
 	a.SetOp(OpType_Aggregate)
 	a.SetOne(true)
 	a.buildPipeline()
-	return faasinfra.FindOne(a.MongodbParam, record)
+	return faasinfra.FindOne(ctx, a.MongodbParam, record)
 }
 
 func (a *AggQuery) GroupBy(field interface{}, alias ...interface{}) mongodb.IAggQuery {

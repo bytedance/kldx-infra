@@ -1,22 +1,10 @@
 package utils
 
 import (
-	cStructs "github.com/bytedance/kldx-common/structs"
-	cUtils "github.com/bytedance/kldx-common/utils"
 	"encoding/json"
 	"fmt"
 	"reflect"
-	"time"
 )
-
-func GetFaasinfraClientConf() *cStructs.HttpConfig {
-	return &cStructs.HttpConfig{
-		Url:                 cUtils.GetFaasinfraUrl(),
-		MaxIdleConns:        100,
-		MaxIdleConnsPerHost: 10,
-		IdleConnTimeout:     10 * time.Second,
-	}
-}
 
 // unittest to use
 func PrintLog(contents ...interface{}) {

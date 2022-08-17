@@ -53,3 +53,27 @@ func appendArg(dst []interface{}, arg interface{}) []interface{} {
 		return append(dst, arg)
 	}
 }
+
+func tranIntCmd2BoolCmd(intCmd *IntCmd) *BoolCmd {
+	boolCmd := NewBoolCmd(intCmd.client, "expire", intCmd.args...)
+	boolCmd.result = intCmd.result
+	boolCmd.err = intCmd.err
+	if intCmd.val == int64(0) {
+		boolCmd.val = false
+	} else {
+		boolCmd.val = true
+	}
+	return boolCmd
+}
+
+func tranStatusCmd2BoolCmd(intCmd *StatusCmd) *BoolCmd {
+	boolCmd := NewBoolCmd(intCmd.client, "expire", intCmd.args...)
+	boolCmd.result = intCmd.result
+	boolCmd.err = intCmd.err
+	if intCmd.val == "" {
+		boolCmd.val = false
+	} else {
+		boolCmd.val = true
+	}
+	return boolCmd
+}

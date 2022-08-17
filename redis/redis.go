@@ -82,33 +82,33 @@ func (c *Redis) Exists(ctx context.Context, keys ...string) *IntCmd {
 }
 
 func (c *Redis) Expire(ctx context.Context, key string, expiration time.Duration) *BoolCmd {
-	cmd := NewBoolCmd(c, "expire", key, formatSec(expiration))
+	cmd := NewIntCmd(c, "expire", key, formatSec(expiration))
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 func (c *Redis) ExpireAt(ctx context.Context, key string, tm time.Time) *BoolCmd {
-	cmd := NewBoolCmd(c, "expireat", key, tm.Unix())
+	cmd := NewIntCmd(c, "expireat", key, tm.Unix())
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 func (c *Redis) Persist(ctx context.Context, key string) *BoolCmd {
-	cmd := NewBoolCmd(c, "persist", key)
+	cmd := NewIntCmd(c, "persist", key)
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 func (c *Redis) PExpire(ctx context.Context, key string, expiration time.Duration) *BoolCmd {
-	cmd := NewBoolCmd(c, "pexpire", key, formatMs(expiration))
+	cmd := NewIntCmd(c, "pexpire", key, formatMs(expiration))
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 func (c *Redis) PExpireAt(ctx context.Context, key string, tm time.Time) *BoolCmd {
-	cmd := NewBoolCmd(c, "pexpireat", key, tm.UnixNano()/int64(time.Millisecond))
+	cmd := NewIntCmd(c, "pexpireat", key, tm.UnixNano()/int64(time.Millisecond))
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 func (c *Redis) PTTL(ctx context.Context, key string) *DurationCmd {
@@ -168,16 +168,16 @@ func (c *Redis) MSet(ctx context.Context, pairs ...interface{}) *StatusCmd {
 
 // SetNX is short for "SET if Not exists".
 func (c *Redis) SetNX(ctx context.Context, key string, value interface{}) *BoolCmd {
-	cmd := NewBoolCmd(c, "setnx", key, value)
+	cmd := NewIntCmd(c, "setnx", key, value)
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 // SetXX is short for "SET if exists".
 func (c *Redis) SetXX(ctx context.Context, key string, value interface{}) *BoolCmd {
-	cmd := NewBoolCmd(c, "set", key, value, "xx")
+	cmd := NewStatusCmd(c, "set", key, value, "xx")
 	cmd.execute(ctx)
-	return cmd
+	return tranStatusCmd2BoolCmd(cmd)
 }
 
 func (c *Redis) SetRange(ctx context.Context, key string, offset int64, value string) *IntCmd {
@@ -231,9 +231,9 @@ func (c *Redis) HDel(ctx context.Context, key string, fields ...string) *IntCmd 
 }
 
 func (c *Redis) HExists(ctx context.Context, key, field string) *BoolCmd {
-	cmd := NewBoolCmd(c, "hexists", key, field)
+	cmd := NewIntCmd(c, "hexists", key, field)
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 func (c *Redis) HGet(ctx context.Context, key, field string) *StringCmd {
@@ -272,6 +272,19 @@ func (c *Redis) HLen(ctx context.Context, key string) *IntCmd {
 	return cmd
 }
 
+// HMSet accepts values in following formats:
+//   - HMSet("hash", "key1", "value1", "key2", "value2")
+//   - HMSet("hash", map[string]interface{}{"key1": "value1", "key2": "value2"})
+//
+func (c *Redis) HMSet(ctx context.Context, key string, pairs ...interface{}) *StatusCmd {
+	args := make([]interface{}, 1, 1+len(pairs))
+	args[0] = key
+	args = appendArgs(args, pairs)
+	cmd := NewStatusCmd(c, "hmset", args...)
+	cmd.execute(ctx)
+	return cmd
+}
+
 // HMGet returns the values for the specified fields in the hash stored at key.
 // It returns an interface{} to distinguish between empty string and nil value.
 func (c *Redis) HMGet(ctx context.Context, key string, fields ...string) *SliceCmd {
@@ -285,25 +298,16 @@ func (c *Redis) HMGet(ctx context.Context, key string, fields ...string) *SliceC
 	return cmd
 }
 
-// HSet accepts values in following formats:
-//   - HSet("myhash", "key1", "value1", "key2", "value2")
-//   - HSet("myhash", []string{"key1", "value1", "key2", "value2"})
-//   - HSet("myhash", map[string]interface{}{"key1": "value1", "key2": "value2"})
-//
-// Note that it requires Redis v4 for multiple field/value pairs support.
-func (c *Redis) HSet(ctx context.Context, key string, values ...interface{}) *IntCmd {
-	args := make([]interface{}, 1, 1+len(values))
-	args[0] = key
-	args = appendArgs(args, values)
-	cmd := NewIntCmd(c, "hset", args...)
+func (c *Redis) HSet(ctx context.Context, key string, field string, value interface{}) *BoolCmd {
+	cmd := NewIntCmd(c, "hset", key, field, value)
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 func (c *Redis) HSetNX(ctx context.Context, key, field string, value interface{}) *BoolCmd {
-	cmd := NewBoolCmd(c, "hsetnx", key, field, value)
+	cmd := NewIntCmd(c, "hsetnx", key, field, value)
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 func (c *Redis) HVals(ctx context.Context, key string) *StringSliceCmd {
@@ -465,9 +469,9 @@ func (c *Redis) SInterStore(destination string, ctx context.Context, keys ...str
 }
 
 func (c *Redis) SIsMember(ctx context.Context, key string, member interface{}) *BoolCmd {
-	cmd := NewBoolCmd(c, "sismember", key, member)
+	cmd := NewIntCmd(c, "sismember", key, member)
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 // SMembers `SMEMBERS key` command output as a slice.
@@ -478,9 +482,9 @@ func (c *Redis) SMembers(ctx context.Context, key string) *StringSliceCmd {
 }
 
 func (c *Redis) SMove(ctx context.Context, source, destination string, member interface{}) *BoolCmd {
-	cmd := NewBoolCmd(c, "smove", source, destination, member)
+	cmd := NewIntCmd(c, "smove", source, destination, member)
 	cmd.execute(ctx)
-	return cmd
+	return tranIntCmd2BoolCmd(cmd)
 }
 
 // SPop `SPOP key` command.
@@ -638,7 +642,7 @@ func (c *Redis) ZInterStore(ctx context.Context, destination string, store *ZSto
 		args[2+i] = key
 	}
 	if len(store.Weights) > 0 {
-		args = append(args, "weights", len(store.Weights))
+		args = append(args, "weights")
 		for _, weight := range store.Weights {
 			args = append(args, weight)
 		}
@@ -685,7 +689,7 @@ func (c *Redis) zRangeBy(ctx context.Context, zcmd string, key string, opt *ZRan
 }
 
 func (c *Redis) ZRangeByScore(ctx context.Context, key string, opt *ZRangeBy) *StringSliceCmd {
-	return c.zRangeBy(ctx,"zrangebyscore", key, opt, false)
+	return c.zRangeBy(ctx, "zrangebyscore", key, opt, false)
 }
 
 func (c *Redis) ZRangeByScoreWithScores(ctx context.Context, key string, opt *ZRangeBy) *ZSliceCmd {
@@ -748,7 +752,7 @@ func (c *Redis) zRevRangeBy(ctx context.Context, zcmd, key string, opt *ZRangeBy
 }
 
 func (c *Redis) ZRevRangeByScore(ctx context.Context, key string, opt *ZRangeBy) *StringSliceCmd {
-	return c.zRevRangeBy(ctx,"zrevrangebyscore", key, opt)
+	return c.zRevRangeBy(ctx, "zrevrangebyscore", key, opt)
 }
 
 func (c *Redis) ZRevRangeByScoreWithScores(ctx context.Context, key string, opt *ZRangeBy) *ZSliceCmd {
@@ -781,7 +785,7 @@ func (c *Redis) ZUnionStore(ctx context.Context, dest string, store *ZStore) *In
 		args[2+i] = key
 	}
 	if len(store.Weights) > 0 {
-		args = append(args, "weights", len(store.Weights))
+		args = append(args, "weights")
 		for _, weight := range store.Weights {
 			args = append(args, weight)
 		}
