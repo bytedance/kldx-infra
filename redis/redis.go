@@ -50,9 +50,9 @@ func (c *Redis) Set(key string, value interface{}, expiration time.Duration) *St
 	args := []interface{}{key, value}
 	if expiration > 0 {
 		if usePrecise(expiration) {
-			args = append(args, "px", formatMs(expiration))
+			args = append(args, "px", formatMils(expiration))
 		} else {
-			args = append(args, "ex", formatSec(expiration))
+			args = append(args, "ex", formatSecond(expiration))
 		}
 	}
 	cmd := NewStatusCmd(c, "set", args...)
@@ -81,7 +81,7 @@ func (c *Redis) Exists(keys ...string) *IntCmd {
 }
 
 func (c *Redis) Expire(key string, expiration time.Duration) *BoolCmd {
-	cmd := NewBoolCmd(c, "expire", key, formatSec(expiration))
+	cmd := NewBoolCmd(c, "expire", key, formatSecond(expiration))
 	cmd.execute()
 	return cmd
 }
@@ -99,7 +99,7 @@ func (c *Redis) Persist(key string) *BoolCmd {
 }
 
 func (c *Redis) PExpire(key string, expiration time.Duration) *BoolCmd {
-	cmd := NewBoolCmd(c, "pexpire", key, formatMs(expiration))
+	cmd := NewBoolCmd(c, "pexpire", key, formatMils(expiration))
 	cmd.execute()
 	return cmd
 }
@@ -156,10 +156,6 @@ func (c *Redis) MGet(keys ...string) *SliceCmd {
 	return cmd
 }
 
-// MSet is like Set but accepts multiple values:
-//   - MSet("key1", "value1", "key2", "value2")
-//   - MSet([]string{"key1", "value1", "key2", "value2"})
-//   - MSet(map[string]interface{}{"key1": "value1", "key2": "value2"})
 func (c *Redis) MSet(values ...interface{}) *StatusCmd {
 	cmd := NewStatusCmd(c, "mset", values...)
 	cmd.execute()
@@ -236,70 +232,6 @@ func (c *Redis) HExists(key, field string) *BoolCmd {
 	return cmd
 }
 
-func (c *Redis) HGet(key, field string) *StringCmd {
-	cmd := NewStringCmd(c, "hget", key, field)
-	cmd.execute()
-	return cmd
-}
-
-func (c *Redis) HGetAll(key string) *StringStringMapCmd {
-	cmd := NewStringStringMapCmd(c, "hgetall", key)
-	cmd.execute()
-	return cmd
-}
-
-func (c *Redis) HIncrBy(key, field string, incr int64) *IntCmd {
-	cmd := NewIntCmd(c, "hincrby", key, field, incr)
-	cmd.execute()
-	return cmd
-}
-
-func (c *Redis) HIncrByFloat(key, field string, incr float64) *FloatCmd {
-	cmd := NewFloatCmd(c, "hincrbyfloat", key, field, incr)
-	cmd.execute()
-	return cmd
-}
-
-func (c *Redis) HKeys(key string) *StringSliceCmd {
-	cmd := NewStringSliceCmd(c, "hkeys", key)
-	cmd.execute()
-	return cmd
-}
-
-func (c *Redis) HLen(key string) *IntCmd {
-	cmd := NewIntCmd(c, "hlen", key)
-	cmd.execute()
-	return cmd
-}
-
-// HMGet returns the values for the specified fields in the hash stored at key.
-// It returns an interface{} to distinguish between empty string and nil value.
-func (c *Redis) HMGet(key string, fields ...string) *SliceCmd {
-	args := make([]interface{}, 1+len(fields))
-	args[0] = key
-	for i, field := range fields {
-		args[i+1] = field
-	}
-	cmd := NewSliceCmd(c, "hmget", args...)
-	cmd.execute()
-	return cmd
-}
-
-// HSet accepts values in following formats:
-//   - HSet("myhash", "key1", "value1", "key2", "value2")
-//   - HSet("myhash", []string{"key1", "value1", "key2", "value2"})
-//   - HSet("myhash", map[string]interface{}{"key1": "value1", "key2": "value2"})
-//
-// Note that it requires Redis v4 for multiple field/value pairs support.
-func (c *Redis) HSet(key string, values ...interface{}) *IntCmd {
-	args := make([]interface{}, 1, 1+len(values))
-	args[0] = key
-	args = appendArgs(args, values)
-	cmd := NewIntCmd(c, "hset", args...)
-	cmd.execute()
-	return cmd
-}
-
 func (c *Redis) HSetNX(key, field string, value interface{}) *BoolCmd {
 	cmd := NewBoolCmd(c, "hsetnx", key, field, value)
 	cmd.execute()
@@ -341,7 +273,7 @@ func (c *Redis) LPop(key string) *StringCmd {
 func (c *Redis) LPush(key string, values ...interface{}) *IntCmd {
 	args := make([]interface{}, 1, 1+len(values))
 	args[0] = key
-	args = appendArgs(args, values)
+	args = appendArguments(args, values)
 	cmd := NewIntCmd(c, "lpush", args...)
 	cmd.execute()
 	return cmd
@@ -350,7 +282,7 @@ func (c *Redis) LPush(key string, values ...interface{}) *IntCmd {
 func (c *Redis) LPushX(key string, values ...interface{}) *IntCmd {
 	args := make([]interface{}, 1, 1+len(values))
 	args[0] = key
-	args = appendArgs(args, values)
+	args = appendArguments(args, values)
 	cmd := NewIntCmd(c, "lpushx", args...)
 	cmd.execute()
 	return cmd
@@ -707,7 +639,7 @@ func (c *Redis) ZRank(key, member string) *IntCmd {
 func (c *Redis) ZRem(key string, members ...interface{}) *IntCmd {
 	args := make([]interface{}, 2, 2+len(members))
 	args[0] = key
-	args = appendArgs(args, members)
+	args = appendArguments(args, members)
 	cmd := NewIntCmd(c, "zrem", args...)
 	cmd.execute()
 	return cmd
@@ -801,7 +733,7 @@ func (c *Redis) ZUnionStore(dest string, store *ZStore) *IntCmd {
 func (c *Redis) PFAdd(key string, els ...interface{}) *IntCmd {
 	args := make([]interface{}, 1, 1+len(els))
 	args[0] = key
-	args = appendArgs(args, els)
+	args = appendArguments(args, els)
 	cmd := NewIntCmd(c, "pfadd", args...)
 	cmd.execute()
 	return cmd

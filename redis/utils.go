@@ -7,49 +7,45 @@ import "time"
 // Set(key, value, redis.KeepTTL)
 const KeepTTL = -1
 
-func usePrecise(dur time.Duration) bool {
-	return dur < time.Second || dur%time.Second != 0
+func usePrecise(param time.Duration) bool {
+	return param < time.Second || param%time.Second != 0
 }
 
-func formatMs(dur time.Duration) int64 {
-	if dur > 0 && dur < time.Millisecond {
+func formatMils(param time.Duration) int64 {
+	if param < time.Millisecond && param > 0 {
 		return 1
 	}
-	return int64(dur / time.Millisecond)
+	return int64(param / time.Millisecond)
 }
 
-func formatSec(dur time.Duration) int64 {
-	if dur > 0 && dur < time.Second {
+func formatSecond(param time.Duration) int64 {
+	if param < time.Second && param > 0 {
 		return 1
 	}
-	return int64(dur / time.Second)
+	return int64(param / time.Second)
 }
 
-func appendArgs(dst, src []interface{}) []interface{} {
-	if len(src) == 1 {
-		return appendArg(dst, src[0])
-	}
-
-	dst = append(dst, src...)
-	return dst
+func appendArguments(destination, source []interface{}) []interface{} {
+	destination = append(destination, source...)
+	return destination
 }
 
-func appendArg(dst []interface{}, arg interface{}) []interface{} {
-	switch arg := arg.(type) {
-	case []string:
-		for _, s := range arg {
-			dst = append(dst, s)
-		}
-		return dst
+func appendArgument(destination []interface{}, source interface{}) []interface{} {
+	switch argument := source.(type) {
 	case []interface{}:
-		dst = append(dst, arg...)
-		return dst
+		destination = append(destination, argument...)
+		return destination
 	case map[string]interface{}:
-		for k, v := range arg {
-			dst = append(dst, k, v)
+		for key, value := range argument {
+			destination = append(destination, key, value)
 		}
-		return dst
+		return destination
+	case []string:
+		for _, arg := range argument {
+			destination = append(destination, arg)
+		}
+		return destination
 	default:
-		return append(dst, arg)
+		return append(destination, argument)
 	}
 }
